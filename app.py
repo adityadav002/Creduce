@@ -27,6 +27,7 @@ try:
     db_url = os.environ.get("MYSQL_URL")
 
     if db_url:
+        # 🚀 Railway (production)
         url = urlparse(db_url)
 
         db = mysql.connector.connect(
@@ -34,13 +35,22 @@ try:
             port=url.port,
             user=url.username,
             password=url.password,
-            database=url.path[1:]  # remove leading '/'
+            database=url.path[1:]
         )
+        print("✅ Connected to Railway DB")
 
-        cursor = db.cursor()
-        print("✅ Database connected (Railway)")
     else:
-        print("❌ MYSQL_URL not found")
+        # 💻 Local MySQL
+        db = mysql.connector.connect(
+            host=os.environ.get("DB_HOST", "localhost"),
+            user=os.environ.get("DB_USER", "root"),
+            password=os.environ.get("DB_PASS", ""),
+            database=os.environ.get("DB_NAME", "expense_tracker"),
+            port=int(os.environ.get("DB_PORT", 3306))
+        )
+        print("✅ Connected to Local DB")
+
+    cursor = db.cursor()
 
 except Exception as e:
     print("❌ Database connection failed:", e)
@@ -94,10 +104,18 @@ def login():
         email = request.form["email"]
         password = request.form["password"]
 
+        if cursor is None:
+            return "Database not connected"
+
         cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
         user = cursor.fetchone()
 
-        if user and bcrypt.checkpw(password.encode(), user[3].encode()):
+        if user is None:
+            return "User not found"
+
+        stored_password = user[3]
+
+        if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
             login_user(User(user[0]))
             return redirect("/")
 
