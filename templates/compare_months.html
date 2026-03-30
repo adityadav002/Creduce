@@ -1,0 +1,411 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+  * { font-family: 'DM Sans', sans-serif; }
+  .playfair { font-family: 'Playfair Display', serif; }
+
+  .card {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  }
+
+  .filter-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
+    padding: 10px 38px 10px 14px;
+    border: 1.5px solid #ede8df;
+    border-radius: 12px;
+    font-size: 14px;
+    color: #374151;
+    background-color: #fff;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+  }
+  .filter-select:focus {
+    border-color: #c9773a;
+    box-shadow: 0 0 0 3px rgba(201,119,58,0.12);
+  }
+
+  .btn-filter {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    background: #c9773a; color: #fff;
+    padding: 10px 22px; border-radius: 12px;
+    font-size: 14px; font-weight: 600;
+    border: none; cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .btn-filter:hover { opacity: 0.9; transform: scale(1.02); }
+
+  /* Month legend badges */
+  .legend-badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 5px 13px; border-radius: 99px;
+    font-size: 12px; font-weight: 600;
+  }
+  .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+  /* Stat comparison card */
+  .stat-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 11px 0;
+    border-bottom: 1px solid #f5f0ea;
+  }
+  .stat-row:last-child { border-bottom: none; }
+
+  .stat-val {
+    font-size: 15px; font-weight: 700;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up { animation: fadeUp 0.45s ease both; }
+</style>
+
+<div id="compare-root" class="min-h-screen p-2 md:p-2">
+
+  <!-- Page Header -->
+  <div class="mb-7 fade-up">
+    <p class="text-xs text-gray-400 uppercase tracking-widest font-medium mb-0.5">Insights</p>
+    <h1 class="playfair text-3xl font-bold text-gray-800">Compare Monthly Expenses</h1>
+  </div>
+
+  <!-- Filter Card -->
+  <div class="card p-6 mb-5 fade-up" style="animation-delay:0.06s">
+
+    <div class="flex items-center gap-2 mb-5">
+      <div class="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="#c9773a" class="w-4 h-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591L15 13.5v6.75l-6-3V13.5L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
+        </svg>
+      </div>
+      <span class="text-sm font-semibold text-gray-600">Select two months to compare</span>
+    </div>
+
+    <form method="get">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+        <!-- Month 1 -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 flex-shrink-0"></span>
+            Month 1
+          </label>
+          <select name="month1" class="filter-select">
+            <option value="">Select Month</option>
+            {% for i, m in [(1,"January"),(2,"February"),(3,"March"),(4,"April"),(5,"May"),(6,"June"),
+                            (7,"July"),(8,"August"),(9,"September"),(10,"October"),(11,"November"),(12,"December")] %}
+              <option value="{{ i }}" {% if month1 == i|string %}selected{% endif %}>{{ m }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Month 2 -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span class="inline-block w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:#7F77DD"></span>
+            Month 2
+          </label>
+          <select name="month2" class="filter-select">
+            <option value="">Select Month</option>
+            {% for i, m in [(1,"January"),(2,"February"),(3,"March"),(4,"April"),(5,"May"),(6,"June"),
+                            (7,"July"),(8,"August"),(9,"September"),(10,"October"),(11,"November"),(12,"December")] %}
+              <option value="{{ i }}" {% if month2 == i|string %}selected{% endif %}>{{ m }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Compare Button -->
+        <div class="flex flex-col justify-end">
+          <button type="submit" class="btn-filter w-full">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+            </svg>
+            Compare
+          </button>
+        </div>
+
+      </div>
+    </form>
+  </div>
+
+  {% if m1_data and m2_data %}
+
+  <!-- Stats Row -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5 fade-up" style="animation-delay:0.12s">
+
+    <!-- Month 1 Total -->
+    <div class="card p-5 relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-20 h-20 rounded-full -translate-y-8 translate-x-8 opacity-30" style="background:#c9773a"></div>
+      <div class="relative z-10">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="legend-badge" style="background:#fef3e2; color:#c9773a">
+            <span class="legend-dot" style="background:#c9773a"></span>
+            Month 1
+          </span>
+        </div>
+        <p class="text-2xl font-bold text-gray-800">
+          ₹{{ m1_data | sum | int | string }}
+        </p>
+        <p class="text-xs text-gray-400 mt-1">Total spending</p>
+      </div>
+    </div>
+
+    <!-- Month 2 Total -->
+    <div class="card p-5 relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-20 h-20 rounded-full -translate-y-8 translate-x-8 opacity-20" style="background:#7F77DD"></div>
+      <div class="relative z-10">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="legend-badge" style="background:#f0effe; color:#7F77DD">
+            <span class="legend-dot" style="background:#7F77DD"></span>
+            Month 2
+          </span>
+        </div>
+        <p class="text-2xl font-bold text-gray-800">
+          ₹{{ m2_data | sum | int | string }}
+        </p>
+        <p class="text-xs text-gray-400 mt-1">Total spending</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Chart + Breakdown -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 fade-up" style="animation-delay:0.18s">
+
+    <!-- Line Chart Card (2/3 width) -->
+    <div class="card p-6 lg:col-span-2">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+        <div>
+          <p class="text-xs text-gray-400 uppercase tracking-widest font-medium mb-0.5">Trend</p>
+          <h2 class="text-lg font-bold text-gray-800">Day-by-Day Comparison</h2>
+        </div>
+        <!-- Legend -->
+        <div class="flex items-center gap-3">
+          <span class="legend-badge" style="background:#fef3e2; color:#c9773a">
+            <span class="legend-dot" style="background:#c9773a"></span>
+            Month 1
+          </span>
+          <span class="legend-badge" style="background:#f0effe; color:#7F77DD">
+            <span class="legend-dot" style="background:#7F77DD"></span>
+            Month 2
+          </span>
+        </div>
+      </div>
+
+      <!-- Responsive chart -->
+      <div class="relative w-full" style="height: 280px">
+        <canvas id="compareChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Difference Panel (1/3 width) -->
+    <div class="card p-6">
+      <div class="mb-4">
+        <p class="text-xs text-gray-400 uppercase tracking-widest font-medium mb-0.5">Analysis</p>
+        <h2 class="text-lg font-bold text-gray-800">Quick Stats</h2>
+      </div>
+
+      <div id="quick-stats">
+
+        <!-- Total Difference -->
+        <div class="stat-row">
+          <div>
+            <p class="text-xs text-gray-400 mb-0.5">Difference</p>
+            <p class="stat-val" id="diff-val">—</p>
+          </div>
+          <div id="diff-badge" class="w-8 h-8 rounded-xl flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4" id="diff-icon"></svg>
+          </div>
+        </div>
+
+        <!-- Higher Month -->
+        <div class="stat-row">
+          <div>
+            <p class="text-xs text-gray-400 mb-0.5">Higher Spend</p>
+            <p class="stat-val" id="higher-val">—</p>
+          </div>
+          <div class="w-8 h-8 rounded-xl bg-red-50 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#e76f51" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Average M1 -->
+        <div class="stat-row">
+          <div>
+            <p class="text-xs text-gray-400 mb-0.5">Avg/Day · Month 1</p>
+            <p class="stat-val" id="avg1-val">—</p>
+          </div>
+          <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:#c9773a"></span>
+        </div>
+
+        <!-- Average M2 -->
+        <div class="stat-row">
+          <div>
+            <p class="text-xs text-gray-400 mb-0.5">Avg/Day · Month 2</p>
+            <p class="stat-val" id="avg2-val">—</p>
+          </div>
+          <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:#7F77DD"></span>
+        </div>
+
+        <!-- Peak day M1 -->
+        <div class="stat-row">
+          <div>
+            <p class="text-xs text-gray-400 mb-0.5">Peak Day · Month 1</p>
+            <p class="stat-val" id="peak1-val">—</p>
+          </div>
+          <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:#c9773a"></span>
+        </div>
+
+        <!-- Peak day M2 -->
+        <div class="stat-row">
+          <div>
+            <p class="text-xs text-gray-400 mb-0.5">Peak Day · Month 2</p>
+            <p class="stat-val" id="peak2-val">—</p>
+          </div>
+          <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:#7F77DD"></span>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  {% else %}
+
+  <!-- Empty / Prompt State -->
+  <div class="card p-14 text-center fade-up" style="animation-delay:0.12s">
+    <div class="flex flex-col items-center gap-3">
+      <div class="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center mb-1">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.3" stroke="#c9773a" class="w-8 h-8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+        </svg>
+      </div>
+      <p class="text-base font-semibold text-gray-500">No comparison yet</p>
+      <p class="text-sm text-gray-300 max-w-xs">Select two months above and hit <strong class="text-gray-400">Compare</strong> to see your spending side by side.</p>
+    </div>
+  </div>
+
+  {% endif %}
+
+</div>
+
+<script>
+  const labels = {{ labels | tojson }};
+  const m1Data = {{ m1_data | tojson }};
+  const m2Data = {{ m2_data | tojson }};
+
+  if (labels && labels.length > 0) {
+
+    /* ── Line Chart ── */
+    const ctx = document.getElementById("compareChart");
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Month 1',
+            data: m1Data,
+            borderWidth: 2.5,
+            tension: 0.4,
+            borderColor: '#c9773a',
+            backgroundColor: 'rgba(201,119,58,0.08)',
+            pointBackgroundColor: '#c9773a',
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            fill: true
+          },
+          {
+            label: 'Month 2',
+            data: m2Data,
+            borderWidth: 2.5,
+            tension: 0.4,
+            borderColor: '#7F77DD',
+            backgroundColor: 'rgba(127,119,221,0.08)',
+            pointBackgroundColor: '#7F77DD',
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            fill: true
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ₹${ctx.parsed.y.toLocaleString()}`
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: { color: '#f5f0ea' },
+            ticks: {
+              color: '#9ca3af',
+              font: { size: 11 },
+              callback: v => '₹' + v.toLocaleString()
+            }
+          },
+          x: {
+            grid: { display: false },
+            ticks: { color: '#9ca3af', font: { size: 11 } }
+          }
+        }
+      }
+    });
+
+    /* ── Quick Stats ── */
+    const sum  = arr => arr.reduce((a, b) => a + b, 0);
+    const peak = arr => Math.max(...arr);
+    const avg  = arr => arr.length ? (sum(arr) / arr.filter(v => v > 0).length || 1).toFixed(0) : 0;
+
+    const total1 = sum(m1Data), total2 = sum(m2Data);
+    const diff   = Math.abs(total1 - total2);
+    const higher = total1 >= total2 ? 'Month 1' : 'Month 2';
+
+    document.getElementById('diff-val').textContent   = '₹' + diff.toLocaleString();
+    document.getElementById('higher-val').textContent = higher;
+    document.getElementById('avg1-val').textContent   = '₹' + avg(m1Data);
+    document.getElementById('avg2-val').textContent   = '₹' + avg(m2Data);
+    document.getElementById('peak1-val').textContent  = '₹' + peak(m1Data).toLocaleString();
+    document.getElementById('peak2-val').textContent  = '₹' + peak(m2Data).toLocaleString();
+
+    /* Diff badge colour */
+    const badge = document.getElementById('diff-badge');
+    const icon  = document.getElementById('diff-icon');
+    if (total1 >= total2) {
+      badge.style.background = '#fdecea';
+      icon.setAttribute('stroke', '#e76f51');
+      icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"/>';
+    } else {
+      badge.style.background = '#e0f5f2';
+      icon.setAttribute('stroke', '#2a9d8f');
+      icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6L9 12.75l4.306-4.307a11.95 11.95 0 015.814 5.519l2.74 1.22m0 0l-5.94 2.28m5.94-2.28l-2.28-5.941"/>';
+    }
+  }
+</script>
+
+{% endblock %}

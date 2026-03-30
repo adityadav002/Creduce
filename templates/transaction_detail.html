@@ -1,0 +1,463 @@
+{% extends "layout.html" %} {% block content %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+  rel="stylesheet"
+/>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+  * { font-family: 'DM Sans', sans-serif; }
+  .playfair { font-family: 'Playfair Display', serif; }
+
+  .card {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  }
+
+  .expense-text { color: #e76f51; }
+  .income-text  { color: #2a9d8f; }
+  .accent-text  { color: #c9773a; }
+
+  /* Table header sort arrows */
+  .th-inner {
+    display: inline-flex; align-items: center; gap: 5px;
+    cursor: pointer; user-select: none;
+    transition: color 0.15s;
+  }
+  .th-inner:hover { color: #c9773a; }
+
+  /* Row hover */
+  .expense-row {
+    border-bottom: 1px solid #f5f0ea;
+    transition: background 0.15s;
+  }
+  .expense-row:last-child { border-bottom: none; }
+  .expense-row:hover { background: #faf8f5; }
+
+  /* Date group header */
+  .date-group-row td {
+    padding: 14px 20px 6px;
+    background: transparent;
+  }
+
+  /* Buttons */
+  .btn-delete {
+    display: inline-flex; align-items: center; gap-4px;
+    padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    background: #fdecea; color: #e76f51; border: none; cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn-delete:hover { background: #fad3cd; transform: scale(1.04); }
+
+  .btn-edit {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    background: #f5e6d3; color: #c9773a; border: none; cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn-edit:hover { background: #edd8be; transform: scale(1.04); }
+
+  /* Category icon box */
+  .cat-icon {
+    width: 32px; height: 32px; border-radius: 10px;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* Tag pill */
+  .tag-pill {
+    display: inline-block; padding: 2px 10px;
+    border-radius: 99px; font-size: 11px; font-weight: 500;
+    background: #f0ebe1; color: #9ca3af;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up { animation: fadeUp 0.4s ease both; }
+
+  /* Search + filter bar */
+  .search-input {
+    border: 1.5px solid #ede8df;
+    border-radius: 12px; padding: 8px 14px 8px 38px;
+    font-size: 14px; color: #374151; background: #fff;
+    outline: none; transition: border-color 0.2s;
+    width: 220px;
+  }
+  .search-input:focus { border-color: #c9773a; }
+
+  /* Responsive: hide less-important cols on small screens */
+  @media (max-width: 640px) {
+    .col-payment, .col-note { display: none; }
+  }
+</style>
+
+<div id="history-root" class="min-h-screen p-2 md:p-2 rounded-lg">
+  <!-- Page Header -->
+  <div
+    class="mb-6 fade-up flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3"
+  >
+    <div>
+      <p
+        class="text-xs text-gray-400 uppercase tracking-widest font-medium mb-0.5"
+      >
+        Transactions
+      </p>
+      <h1 class="playfair text-3xl font-bold text-gray-800">Expense History</h1>
+    </div>
+
+    <!-- Search -->
+    <div class="relative">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+        />
+      </svg>  
+      <input
+        class="search-input"
+        type="text"
+        placeholder="Search transactions…"
+        id="searchInput"
+        oninput="filterRows()"
+      />
+    </div>
+  </div>
+
+  <!-- Table Card -->
+  <div class="card fade-up overflow-hidden" style="animation-delay: 0.08s">
+    <!-- Table -->
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse" id="expenseTable">
+        <!-- Header -->
+        <thead>
+          <tr class="border-b border-gray-100">
+            <th
+              class="text-left px-5 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider w-32"
+            >
+              <span class="th-inner">
+                Time
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="2"
+                  stroke="currentColor"
+                  class="w-3 h-3 opacity-50"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+                  />
+                </svg>
+              </span>
+            </th>
+            <th
+              class="text-left px-4 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider"
+            >
+              <span class="th-inner">
+                Category
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="2"
+                  stroke="currentColor"
+                  class="w-3 h-3 opacity-50"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+                  />
+                </svg>
+              </span>
+            </th>
+            <th
+              class="text-left px-4 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider"
+            >
+              <span class="th-inner">
+                Amount
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="2"
+                  stroke="currentColor"
+                  class="w-3 h-3 opacity-50"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+                  />
+                </svg>
+              </span>
+            </th>
+            <th
+              class="text-left px-4 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider col-note hidden sm:table-cell"
+            >
+              Note
+            </th>
+            <th
+              class="text-left px-4 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider col-payment hidden md:table-cell"
+            >
+              <span class="th-inner">
+                Payment
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="2"
+                  stroke="currentColor"
+                  class="w-3 h-3 opacity-50"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+                  />
+                </svg>
+              </span>
+            </th>
+            <th
+              class="text-center px-4 py-4 text-xs font-semibold text-gray-400 uppercase tracking-wider w-24"
+            >
+              Actions
+            </th>
+          </tr>
+        </thead>
+
+        <tbody id="tableBody">
+          {% set current_date = namespace(val='') %} {% for row in data %}
+
+          <!-- Expense Row -->
+          <tr
+            class="expense-row"
+            data-search="{{ row[2] }} {{ row[4] }} {{ row[5] }}"
+          >
+            <!-- Date/Time -->
+            <td class="px-5 py-3.5">
+              <span class="text-sm text-gray-500 font-medium"
+                >{{ row[1] }}</span
+              >
+            </td>
+
+            <!-- Category -->
+            <td class="px-3 sm:px-5 py-3">
+              <div class="flex items-center gap-2.5">
+                <div class="cat-icon bg-amber-50">
+                  <!-- Generic category icon -->
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.6"
+                    stroke="#c9773a"
+                    class="w-4 h-4"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M6 6h.008v.008H6V6z"
+                    />
+                  </svg>
+                </div>
+                <span class="text-sm font-semibold text-gray-700"
+                  >{{ row[2] }}</span
+                >
+              </div>
+            </td>
+
+            <!-- Amount -->
+            <td class="px-3 sm:px-5 py-3">
+              <span class="text-sm font-bold expense-text">₹{{ row[3] }}</span>
+            </td>
+
+            <!-- Note -->
+            <td class="px-3 sm:px-5 py-3 col-note hidden sm:table-cell">
+              <span class="text-sm text-gray-400"
+                >{{ row[4] if row[4] else '—' }}</span
+              >
+            </td>
+
+            <!-- Payment -->
+            <td class="px-3 sm:px-5 py-3 col-payment hidden md:table-cell">
+              <div class="flex items-center gap-1.5">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="#9ca3af"
+                  class="w-4 h-4 flex-shrink-0"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"
+                  />
+                </svg>
+                <span class="text-sm text-gray-500"
+                  >{{ row[5] if row[5] else '—' }}</span
+                >
+              </div>
+            </td>
+
+            <!-- Actions -->
+            <td class="px-3 sm:px-5 py-3">
+              <div class="flex items-center justify-center gap-2">
+                <!-- Edit -->
+                <a href="/editExpense/{{ row[0] }}">
+                  <button class="btn-edit" title="Edit">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                      stroke="currentColor"
+                      class="w-3.5 h-3.5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M16.862 4.487a2.25 2.25 0 113.182 3.182L7.5 20.212l-4.5 1.5 1.5-4.5L16.862 4.487z"
+                      />
+                    </svg>
+                    Edit
+                  </button>
+                </a>
+
+                <!-- Delete -->
+                <form
+                  action="/deleteExpense"
+                  method="post"
+                  style="display: inline"
+                >
+                  <input type="hidden" name="id" value="{{ row[0] }}" />
+                  <button
+                    class="btn-delete"
+                    type="submit"
+                    onclick="return confirm('Delete this expense?');"
+                    title="Delete"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="2"
+                      stroke="currentColor"
+                      class="w-3.5 h-3.5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                      />
+                    </svg>
+                    Delete
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+
+          <!-- Empty state -->
+          {% if not data %}
+          <tr>
+            <td colspan="6" class="py-20 text-center">
+              <div class="flex flex-col items-center gap-3 text-gray-300">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.2"
+                  stroke="currentColor"
+                  class="w-14 h-14"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+                  />
+                </svg>
+                <p class="text-base font-medium text-gray-400">
+                  No transactions yet
+                </p>
+                <p class="text-sm text-gray-300">
+                  Add your first expense to get started
+                </p>
+              </div>
+            </td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer: row count -->
+    <div
+      class="px-5 py-3 border-t border-gray-100 flex items-center justify-between"
+    >
+      <p class="text-xs text-gray-400" id="rowCount">
+        {{ data | length }} transaction{{ 's' if data | length != 1 else '' }}
+      </p>
+      <div class="flex items-center gap-1.5 text-xs text-gray-400">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="#9ca3af"
+          class="w-3.5 h-3.5"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+          />
+        </svg>
+        Sorted by date
+      </div>
+    </div>
+  </div>
+  <!-- /card -->
+</div>
+
+<script>
+  function filterRows() {
+    const q = document.getElementById("searchInput").value.toLowerCase();
+    const rows = document.querySelectorAll("#tableBody .expense-row");
+    let visible = 0;
+    rows.forEach((r) => {
+      const text = (r.dataset.search || "").toLowerCase();
+      const show = !q || text.includes(q);
+      r.style.display = show ? "" : "none";
+      if (show) visible++;
+    });
+    document.getElementById("rowCount").textContent =
+      visible + " transaction" + (visible !== 1 ? "s" : "");
+  }
+</script>
+
+{% endblock %}

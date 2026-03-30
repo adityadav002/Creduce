@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <title>Edit Expense</title>
+  </head>
+
+  <body class="min-h-screen flex items-center justify-center bg-black px-4">
+
+    <div class="w-full max-w-md bg-white p-6 md:p-8 rounded-2xl shadow-xl">
+
+      <!-- Title -->
+      <h1 class="text-2xl md:text-3xl font-bold text-indigo-600 text-center mb-6">
+        Edit Expense
+      </h1>
+
+      <!-- Form -->
+      <form action="/updateExpense" method="POST" class="space-y-4">
+
+        <!-- Hidden ID -->
+        <input type="hidden" name="id" value="{{ expense[0] }}" />
+
+        <!-- Date -->
+        <input
+          type="date"
+          name="exp_date"
+          value="{{ expense[1] }}"
+          class="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+        />
+
+        <!-- Category -->
+        <select
+          name="category"
+          class="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+        >
+          <option value="food">Food</option>
+          <option value="groceries">Groceries</option>
+          <option value="travel">Travel</option>
+          <option value="clothing">Clothing</option>
+          <option value="tech">Tech</option>
+          <option value="shopping">Shopping</option>
+          <option value="entertainment">Entertainment</option>
+          <option value="health">Healthcare</option>
+          <option value="bills">Bills</option>
+          <option value="other">Other</option>
+        </select>
+
+        <!-- Amount -->
+        <input
+          type="number"
+          name="amount"
+          value="{{ expense[3] }}"
+          class="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+        />
+
+        <!-- Note -->
+        <textarea
+          name="note"
+          class="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white resize-none"
+        >{{ expense[4] }}</textarea>
+
+        <!-- Payment -->
+        <select
+          name="payment"
+          class="w-full px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"
+        >
+          <option value="cash">Cash</option>
+          <option value="upi">UPI</option>
+          <option value="credit_card">Credit Card</option>
+          <option value="debit_card">Debit Card</option>
+          <option value="net_banking">Net Banking</option>
+        </select>
+
+        <!-- Button -->
+        <button
+          type="submit"
+          class="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition active:scale-95"
+        >
+          Update Expense
+        </button>
+
+      </form>
+    </div>
+
+  </body>
+</html>

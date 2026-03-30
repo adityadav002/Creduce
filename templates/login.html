@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Creduce · Login</title>
+
+  <style>
+    * { font-family: 'DM Sans', sans-serif; }
+    .playfair { font-family: 'Playfair Display', serif; }
+
+    body { background-color: #f0ebe1; }
+
+    /* Left panel decorative shapes */
+    .panel-circle-1 {
+      position: absolute; width: 300px; height: 300px; border-radius: 50%;
+      background: rgba(255,255,255,0.07); top: -80px; right: -80px; pointer-events: none;
+    }
+    .panel-circle-2 {
+      position: absolute; width: 200px; height: 200px; border-radius: 50%;
+      background: rgba(255,255,255,0.06); bottom: 60px; left: -60px; pointer-events: none;
+    }
+    .panel-blob {
+      position: absolute; width: 260px; height: 180px;
+      border-radius: 40% 60% 55% 45% / 50% 45% 55% 50%;
+      background: rgba(255,255,255,0.06); bottom: 140px; right: 10px; pointer-events: none;
+    }
+
+    /* Input */
+    .field {
+      width: 100%; padding: 11px 42px 11px 42px;
+      border: 1.5px solid #ede8df; border-radius: 12px;
+      font-size: 14px; color: #374151; background: #fff; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .field:focus {
+      border-color: #c9773a;
+      box-shadow: 0 0 0 3px rgba(201,119,58,0.12);
+    }
+    .field::placeholder { color: #9ca3af; }
+    .field-wrap { position: relative; }
+    .field-icon {
+      position: absolute; left: 13px; top: 50%;
+      transform: translateY(-50%); pointer-events: none;
+    }
+
+    /* Submit button */
+    .btn-submit {
+      width: 100%; background: #c9773a; color: #fff;
+      padding: 13px; border-radius: 12px;
+      font-size: 15px; font-weight: 700; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      transition: opacity 0.15s, transform 0.1s; letter-spacing: 0.01em;
+    }
+    .btn-submit:hover  { opacity: 0.92; }
+    .btn-submit:active { transform: scale(0.98); }
+
+    /* Label */
+    .field-label {
+      font-size: 11px; font-weight: 600; color: #9ca3af;
+      text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px;
+      display: flex; align-items: center; gap: 5px;
+    }
+
+    .divider { border: none; border-top: 1.5px solid #f5f0ea; margin: 4px 0; }
+
+    /* Glass card on left panel */
+    .glass-card {
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 16px; padding: 16px 18px;
+      backdrop-filter: blur(4px);
+    }
+
+    /* Feature list item */
+    .feature-item {
+      display: flex; align-items: center; gap: 10px;
+      color: rgba(255,255,255,0.8); font-size: 13px;
+    }
+    .feature-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: rgba(255,255,255,0.5); flex-shrink: 0;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.45s ease both; }
+  </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4 md:p-6">
+
+  <!-- Page bg blobs -->
+  <div class="fixed top-0 left-0 w-72 h-72 rounded-full pointer-events-none"
+       style="background:rgba(201,119,58,0.08); transform:translate(-40%,-40%)"></div>
+  <div class="fixed bottom-0 right-0 w-96 h-96 rounded-full pointer-events-none"
+       style="background:rgba(201,119,58,0.06); transform:translate(30%,30%)"></div>
+
+  <!-- Card -->
+  <div class="relative z-10 w-full max-w-5xl flex flex-col md:flex-row rounded-3xl overflow-hidden shadow-2xl fade-up"
+       style="min-height: 540px">
+
+    <!-- ── LEFT PANEL ── -->
+    <div class="hidden md:flex flex-col w-1/2 p-10 relative overflow-hidden"
+         style="background: linear-gradient(135deg, #c9773a 0%, #a85e28 100%)">
+
+      <div class="panel-circle-1"></div>
+      <div class="panel-circle-2"></div>
+      <div class="panel-blob"></div>
+
+      <!-- Brand -->
+      <div class="flex items-center gap-2.5 z-10 relative">
+        <div class="w-9 h-9 rounded-xl flex items-center justify-center"
+             style="background:rgba(255,255,255,0.2)">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+               stroke-width="1.8" stroke="#fff" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75"/>
+          </svg>
+        </div>
+        <span class="playfair text-white font-bold text-xl">Creduce</span>
+      </div>
+
+      <!-- Hero -->
+      <div class="z-10 relative mt-12 mb-8 flex-1">
+        <p class="text-xs uppercase tracking-widest font-semibold mb-3"
+           style="color:rgba(255,255,255,0.5)">Welcome back</p>
+        <h1 class="playfair text-white text-3xl font-bold leading-tight mb-4">
+          Creduce: to trust<br/>and to grow.
+        </h1>
+        <p class="text-sm leading-relaxed mb-8"
+           style="color:rgba(255,255,255,0.65)">
+          Your journey toward financial clarity continues here. Log in,
+          stay consistent, and keep building your wealth one entry at a time.
+        </p>
+
+        <!-- Feature list -->
+        <div class="flex flex-col gap-3">
+          <div class="feature-item">
+            <span class="feature-dot"></span>
+            Track every rupee, effortlessly
+          </div>
+          <div class="feature-item">
+            <span class="feature-dot"></span>
+            Visual insights across categories & months
+          </div>
+          <div class="feature-item">
+            <span class="feature-dot"></span>
+            Stay within budget, always
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+    <!-- ── RIGHT PANEL ── -->
+    <div class="bg-white flex flex-col w-full md:w-1/2">
+
+      <!-- Mobile brand -->
+      <div class="flex md:hidden items-center gap-2 px-6 pt-6 pb-2">
+        <div class="w-8 h-8 rounded-xl bg-amber-500 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+               stroke-width="1.8" stroke="#fff" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75"/>
+          </svg>
+        </div>
+        <span class="playfair font-bold text-lg text-gray-800">Creduce</span>
+      </div>
+
+      <!-- Form -->
+      <div class="flex flex-col justify-center flex-1 px-6 md:px-10 py-8">
+
+        <div class="mb-8">
+          <p class="text-xs text-gray-400 uppercase tracking-widest font-medium mb-1">Sign in</p>
+          <h2 class="playfair text-2xl md:text-3xl font-bold text-gray-800">Welcome back 👋</h2>
+        </div>
+
+        <form method="POST" class="flex flex-col gap-5">
+
+          <!-- Email -->
+          <div>
+            <p class="field-label">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="1.8" stroke="#9ca3af" class="w-3.5 h-3.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/>
+              </svg>
+              Email
+            </p>
+            <div class="field-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="1.6" stroke="#c9773a" class="w-4 h-4 field-icon">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/>
+              </svg>
+              <input type="email" id="email" name="email"
+                placeholder="you@example.com" required class="field" />
+            </div>
+          </div>
+
+          <hr class="divider" />
+
+          <!-- Password -->
+          <div>
+            <p class="field-label">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="1.8" stroke="#9ca3af" class="w-3.5 h-3.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+              </svg>
+              Password
+            </p>
+            <div class="field-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke-width="1.6" stroke="#c9773a" class="w-4 h-4 field-icon">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+              </svg>
+              <input type="password" id="pwd-input" name="password"
+                placeholder="Your password" required class="field" />
+              <!-- Eye toggle -->
+              <button type="button" onclick="togglePwd()"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors"
+                tabindex="-1">
+                <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 24 24" stroke-width="1.6" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Register link -->
+          <p class="text-sm text-gray-400 text-center">
+            Don't have an account?
+            <a href="register" class="font-semibold hover:underline" style="color:#c9773a">Register</a>
+          </p>
+
+          <!-- Submit -->
+          <button type="submit" class="btn-submit">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="2.2" stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/>
+            </svg>
+            Login
+          </button>
+
+        </form>
+
+        <p class="text-center text-xs text-gray-300 mt-6">
+          Your data is private and never shared.
+        </p>
+
+      </div>
+    </div>
+
+  </div>
+
+</body>
+
+<script>
+  function togglePwd() {
+    const input = document.getElementById('pwd-input');
+    const icon  = document.getElementById('eye-icon');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.innerHTML = `
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/>`;
+    } else {
+      input.type = 'password';
+      icon.innerHTML = `
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>`;
+    }
+  }
+</script>
+
+</html>

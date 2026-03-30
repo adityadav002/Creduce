@@ -1,0 +1,532 @@
+{% extends "layout.html" %} {% block content %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+  rel="stylesheet"
+/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script
+  src="https://unpkg.com/@heroicons/react@2.0.18/dist/index.js"
+  crossorigin
+></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+  * {
+    font-family: "DM Sans", sans-serif;
+  }
+  .playfair {
+    font-family: "Playfair Display", serif;
+  }
+
+  .card {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    transition:
+      box-shadow 0.2s ease,
+      transform 0.2s ease;
+  }
+  .card:hover {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .income-text {
+    color: #2a9d8f;
+  }
+  .expense-text {
+    color: #e76f51;
+  }
+  .accent-bg {
+    background-color: #c9773a;
+  }
+  .accent-light {
+    background-color: #f5e6d3;
+  }
+  .accent-text {
+    color: #c9773a;
+  }
+
+  .icon-box {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .icon-box-green {
+    background: #e0f5f2;
+  }
+  .icon-box-red {
+    background: #fdecea;
+  }
+  .icon-box-amber {
+    background: #f5e6d3;
+  }
+  .icon-box-gray {
+    background: #f0f0f0;
+  }
+
+  .stat-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+  .budget-bar-track {
+    background: #ede8df;
+    border-radius: 99px;
+    height: 10px;
+    overflow: hidden;
+  }
+  .budget-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .fade-up {
+    animation: fadeUp 0.5s ease both;
+  }
+  .delay-1 {
+    animation-delay: 0.07s;
+  }
+  .delay-2 {
+    animation-delay: 0.14s;
+  }
+  .delay-3 {
+    animation-delay: 0.21s;
+  }
+  .delay-4 {
+    animation-delay: 0.28s;
+  }
+  .delay-5 {
+    animation-delay: 0.35s;
+  }
+  .delay-6 {
+    animation-delay: 0.42s;
+  }
+</style>
+
+<div id="dashboard-root" class="min-h-screen p-2 md:p-2 rounded-lg">
+  <!-- Header -->
+  <div class="mb-7 fade-up">
+    <p
+      class="text-sm text-gray-400 uppercase tracking-widest font-medium mb-0.5"
+    >
+      Overview
+    </p>
+    <h1 class="playfair text-3xl font-bold text-gray-800">Expense Dashboard</h1>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+    <!-- LEFT COLUMN -->
+    <div class="lg:col-span-2 flex flex-col gap-5">
+      <!-- Top Row: January Card + Asset Summary -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <!-- January Expense Card -->
+        <div class="card p-6 fade-up delay-1 relative overflow-hidden">
+          <div
+            class="absolute top-0 right-0 w-40 h-40 accent-light rounded-full -translate-y-10 translate-x-10 opacity-60"
+          ></div>
+          <div class="flex items-start justify-between relative z-10">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="playfair text-xl font-bold text-gray-800"
+                  >January</span
+                >
+                <span
+                  class="text-xs font-semibold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full"
+                  >Expense</span
+                >
+              </div>
+              <div class="stat-value expense-text">₹{{ total }}</div>
+              <div class="mt-2 text-sm text-gray-400">
+                Avg per transaction:
+                <span class="font-semibold text-gray-600">₹{{ average }}</span>
+              </div>
+              <div class="text-sm text-gray-400 mt-0.5">
+                Transactions:
+                <span class="font-semibold text-gray-600">{{ count }}</span>
+              </div>
+            </div>
+          </div>
+          <button
+            class="mt-4 accent-bg text-white text-sm font-semibold px-5 py-2 rounded-xl hover:opacity-90 transition-opacity relative z-10"
+          >
+            <a href="monthly_transaction">
+              View Details
+            </a>
+          </button>
+
+          <br />
+          <br />
+
+          <!-- Budget Status Badge -->
+        </div>
+
+        <!-- Asset / Budget Summary -->
+        <div class="card p-6 fade-up delay-2">
+          <p
+            class="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-4"
+          >
+            Budget Summary
+          </p>
+          <div class="flex flex-col gap-4">
+            <!-- Monthly Budget -->
+            <div class="flex items-center gap-3">
+              <div class="icon-box icon-box-gray">
+                <!-- Heroicon: building-library -->
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="#6b7280"
+                  class="w-5 h-5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p class="text-xs text-gray-400">Monthly Budget</p>
+                <p class="font-bold text-gray-800">₹{{ monthly_budget }}</p>
+              </div>
+            </div>
+            <!-- Already Spent -->
+            <div class="flex items-center gap-3">
+              <div class="icon-box icon-box-red">
+                <!-- Heroicon: credit-card -->
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="#e76f51"
+                  class="w-5 h-5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p class="text-xs text-gray-400">Already Spent</p>
+                <p class="font-bold expense-text">₹{{ total }}</p>
+              </div>
+            </div>
+            <!-- Remaining / Over -->
+            <div class="flex items-center gap-3">
+              <div class="icon-box icon-box-green">
+                <!-- Heroicon: banknotes / arrow-trending-up -->
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="#2a9d8f"
+                  class="w-5 h-5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75"
+                  />
+                </svg>
+              </div>
+              <div>
+                {% if monthly_budget > total %}
+                <p class="text-xs text-gray-400">Remaining</p>
+                <p class="font-bold income-text">₹{{ remaining_spending }}</p>
+                {% else %}
+                <p class="text-xs text-gray-400">Over Budget</p>
+                <p class="font-bold expense-text">₹{{ over_spending }}</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="mt-4">
+            <div class="flex justify-between text-xs text-gray-400 mb-1.5">
+              <span>Spent</span>
+              <span>Budget</span>
+            </div>
+            <div class="budget-bar-track">
+              {% if monthly_budget > 0 %} {% set pct = (total / monthly_budget *
+              100) | int %} {% else %} {% set pct = 0 %} {% endif %}
+              <div
+                class="budget-bar-fill {% if pct > 100 %}bg-red-500{% else %}bg-amber-500{% endif %}"
+                style="width: {{ [pct, 100] | min }}%"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Period Cards Row -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 fade-up delay-3">
+        <!-- Today -->
+        <div class="card p-4 rounded-xl shadow-sm hover:shadow-md transition">
+          <div class="flex items-center gap-2 mb-3">
+            <div class="icon-box icon-box-gray w-9 h-9 rounded-xl">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="#6b7280"
+                class="w-4 h-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5"
+                />
+              </svg>
+            </div>
+            <span class="text-xs font-semibold text-gray-500">Today</span>
+          </div>
+          <p class="text-lg font-bold text-gray-800">{{ today_total }}</p>
+          <p class="text-xs text-gray-400 mt-1">{{ today_label }}</p>
+        </div>
+
+        <!-- This Week -->
+        <div class="card p-4 rounded-xl shadow-sm hover:shadow-md transition">
+          <div class="flex items-center gap-2 mb-3">
+            <div class="icon-box icon-box-gray w-9 h-9 rounded-xl">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="#6b7280"
+                class="w-4 h-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5"
+                />
+              </svg>
+            </div>
+            <span class="text-xs font-semibold text-gray-500">This Week</span>
+          </div>
+          <p class="text-lg font-bold text-gray-800">{{ week_total }}</p>
+          <p class="text-xs text-gray-400 mt-1">{{ week_range }}</p>
+        </div>
+
+        <!-- This Month -->
+        <div class="card p-4 rounded-xl shadow-sm hover:shadow-md transition">
+          <div class="flex items-center gap-2 mb-3">
+            <div class="icon-box icon-box-amber w-9 h-9 rounded-xl">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="#c9773a"
+                class="w-4 h-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5"
+                />
+              </svg>
+            </div>
+            <span class="text-xs font-semibold text-gray-500">This Month</span>
+          </div>
+          <p class="text-lg font-bold text-gray-800">{{ month_total }}</p>
+          <p class="text-xs text-gray-400 mt-1">{{ month_range }}</p>
+        </div>
+
+        <!-- This Year -->
+        <div class="card p-4 rounded-xl shadow-sm hover:shadow-md transition">
+          <div class="flex items-center gap-2 mb-3">
+            <div class="icon-box icon-box-green w-9 h-9 rounded-xl">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="#2a9d8f"
+                class="w-4 h-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5"
+                />
+              </svg>
+            </div>
+            <span class="text-xs font-semibold text-gray-500">This Year</span>
+          </div>
+          <p class="text-lg font-bold text-gray-800">{{ year_total }}</p>
+          <p class="text-xs text-gray-400 mt-1">{{ year_label }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="flex flex-col gap-5">
+      <!-- Spending Highlights Card -->
+      <div class="card p-6 fade-up delay-4">
+        <p
+          class="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-4"
+        >
+          Spending Highlights
+        </p>
+
+        <!-- Highest Purchase -->
+        <div class="mb-4">
+          <div class="flex items-center gap-2 mb-1.5">
+            <div class="icon-box icon-box-red w-9 h-9 rounded-xl">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="#e76f51"
+                class="w-4 h-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+                />
+              </svg>
+            </div>
+            <span class="text-xs font-semibold text-gray-500"
+              >Biggest Purchase</span
+            >
+          </div>
+          <div class="ml-11">
+            <p class="font-bold text-gray-800 truncate">{{ max_note }}</p>
+            <p class="text-sm expense-text font-semibold">₹{{ max_amount }}</p>
+          </div>
+        </div>
+
+        <hr class="border-gray-100 my-3" />
+
+        <!-- Top Spending Category -->
+        <div class="mb-4">
+          <div class="flex items-center gap-2 mb-1.5">
+            <div class="icon-box icon-box-red w-9 h-9 rounded-xl">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="#e76f51"
+                class="w-4 h-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"
+                />
+              </svg>
+            </div>
+            <span class="text-xs font-semibold text-gray-500"
+              >Top Category</span
+            >
+          </div>
+          <div class="ml-11">
+            <p class="font-bold text-gray-800">{{ top_category }}</p>
+            <p class="text-sm expense-text font-semibold">₹{{ top_amount }}</p>
+          </div>
+        </div>
+
+        <!-- Lowest Spending Category -->
+        <div>
+          <div class="flex items-center gap-2 mb-1.5">
+            <div class="icon-box icon-box-green w-9 h-9 rounded-xl">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="#2a9d8f"
+                class="w-4 h-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"
+                />
+              </svg>
+            </div>
+            <span class="text-xs font-semibold text-gray-500"
+              >Lowest Category</span
+            >
+          </div>
+          <div class="ml-11">
+            <p class="font-bold text-gray-800">{{ low_category }}</p>
+            <p class="text-sm income-text font-semibold">₹{{ low_amount }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Predicted Expense Card -->
+      <div class="card p-6 fade-up delay-5 relative overflow-hidden">
+        <div
+          class="absolute bottom-0 right-0 w-24 h-24 bg-teal-50 rounded-full translate-y-8 translate-x-8 opacity-70"
+        ></div>
+        <div class="flex items-start justify-between relative z-10">
+          <div>
+            <p
+              class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-6 "
+            >
+              Predicted Next Month
+            </p>
+            <div class="stat-value income-text">₹{{ predicted_expense }}</div>
+            <p class="text-sm text-gray-400 mt-2">
+              Based on this month's trend
+            </p>
+          </div>
+          <div
+            class="icon-box icon-box-green w-12 h-12 rounded-2xl flex-shrink-0"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="#2a9d8f"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
