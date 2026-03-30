@@ -117,6 +117,8 @@ def login():
 
         if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):
             login_user(User(user[0]))
+            print("Login route hit") # debugging
+            print("User:", user)
             return redirect("/")
 
         return "Invalid credentials"
