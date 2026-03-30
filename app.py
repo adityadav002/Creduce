@@ -8,19 +8,22 @@ from sklearn.linear_model import LinearRegression
 import joblib
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import bcrypt
+from dotenv import load_dotenv
 
 # ---------------- SETUP ---------------- #
-
 app = Flask(__name__)
 app.secret_key = "secret_key"
+
+load_dotenv()
+app.secret_key = os.environ.get("SECRET_KEY", "dev_key")
 
 model = joblib.load("trained_model.pkl")
 
 db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="#Aditya@0903",
-    database="expense_tracker"
+    host=os.environ.get("DB_HOST", "localhost"),
+    user=os.environ.get("DB_USER", "root"),
+    password=os.environ.get("DB_PASS", ""),
+    database=os.environ.get("DB_NAME", "expense_tracker")
 )
 cursor = db.cursor()
 
