@@ -12,14 +12,16 @@ from dotenv import load_dotenv
 
 # ---------------- SETUP ---------------- #
 app = Flask(__name__)
-app.secret_key = "secret_key"
 
 load_dotenv()
+app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev_key")
+print("🚀 Flask app starting...")
 
 model = joblib.load("trained_model.pkl")
 
 db = None
+cursor = None
 try:
     db = mysql.connector.connect(
         host=os.environ.get("DB_HOST"),
@@ -27,10 +29,10 @@ try:
         password=os.environ.get("DB_PASS"),
         database=os.environ.get("DB_NAME")
     )
+    cursor = db.cursor()
     print("✅ Database connected")
 except Exception as e:
     print("❌ Database connection failed:", e)
-cursor = db.cursor()
 
 # ---------------- AUTH ---------------- #
 
