@@ -9,6 +9,7 @@ import joblib
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import bcrypt
 from dotenv import load_dotenv
+from urllib.parse import urlparse
 
 # ---------------- SETUP ---------------- #
 app = Flask(__name__)
@@ -23,15 +24,24 @@ model = joblib.load("trained_model.pkl")
 db = None
 cursor = None
 try:
-    db = mysql.connector.connect(
-        host=os.environ.get("DB_HOST"),
-        user=os.environ.get("DB_USER"),
-        port=int(os.environ.get("DB_PORT", 3306)),
-        password=os.environ.get("DB_PASS"),
-        database=os.environ.get("DB_NAME")
-    )
-    cursor = db.cursor()
-    print("✅ Database connected")
+    db_url = os.environ.get("MYSQL_URL")
+
+    if db_url:
+        url = urlparse(db_url)
+
+        db = mysql.connector.connect(
+            host=url.hostname,
+            port=url.port,
+            user=url.username,
+            password=url.password,
+            database=url.path[1:]  # remove leading '/'
+        )
+
+        cursor = db.cursor()
+        print("✅ Database connected (Railway)")
+    else:
+        print("❌ MYSQL_URL not found")
+
 except Exception as e:
     print("❌ Database connection failed:", e)
 
