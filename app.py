@@ -19,12 +19,17 @@ app.secret_key = os.environ.get("SECRET_KEY", "dev_key")
 
 model = joblib.load("trained_model.pkl")
 
-db = mysql.connector.connect(
-    host=os.environ.get("DB_HOST", "localhost"),
-    user=os.environ.get("DB_USER", "root"),
-    password=os.environ.get("DB_PASS", ""),
-    database=os.environ.get("DB_NAME", "expense_tracker")
-)
+db = None
+try:
+    db = mysql.connector.connect(
+        host=os.environ.get("DB_HOST"),
+        user=os.environ.get("DB_USER"),
+        password=os.environ.get("DB_PASS"),
+        database=os.environ.get("DB_NAME")
+    )
+    print("✅ Database connected")
+except Exception as e:
+    print("❌ Database connection failed:", e)
 cursor = db.cursor()
 
 # ---------------- AUTH ---------------- #
