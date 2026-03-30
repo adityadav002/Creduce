@@ -122,7 +122,6 @@ def login():
             return redirect("/")
 
         return "Invalid credentials"
-
     return render_template("login.html")
 
 
@@ -137,6 +136,7 @@ def logout():
 @app.route("/")
 @login_required
 def main():
+    print("HOME ROUTE HIT")
     user_id = current_user.id
     now = datetime.now()
 
