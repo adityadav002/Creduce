@@ -23,37 +23,35 @@ model = joblib.load("trained_model.pkl")
 
 db = None
 cursor = None
-try:
-    db_url = os.environ.get("MYSQL_URL")
+def get_cursor():
+    try:
+        db_url = os.environ.get("MYSQL_URL")
 
-    if db_url:
-        # 🚀 Railway (production)
-        url = urlparse(db_url)
+        if db_url:
+            from urllib.parse import urlparse
+            url = urlparse(db_url)
 
-        db = mysql.connector.connect(
-            host=url.hostname,
-            port=url.port,
-            user=url.username,
-            password=url.password,
-            database=url.path[1:]
-        )
-        print("✅ Connected to Railway DB")
+            db = mysql.connector.connect(
+                host=url.hostname,
+                port=url.port,
+                user=url.username,
+                password=url.password,
+                database=url.path[1:]
+            )
+        else:
+            db = mysql.connector.connect(
+                host=os.environ.get("DB_HOST"),
+                user=os.environ.get("DB_USER"),
+                password=os.environ.get("DB_PASS"),
+                database=os.environ.get("DB_NAME"),
+                port=int(os.environ.get("DB_PORT", 3306))
+            )
 
-    else:
-        # 💻 Local MySQL
-        db = mysql.connector.connect(
-            host=os.environ.get("DB_HOST", "localhost"),
-            user=os.environ.get("DB_USER", "root"),
-            password=os.environ.get("DB_PASS", ""),
-            database=os.environ.get("DB_NAME", "expense_tracker"),
-            port=int(os.environ.get("DB_PORT", 3306))
-        )
-        print("✅ Connected to Local DB")
+        return db.cursor(), db
 
-    cursor = db.cursor()
-
-except Exception as e:
-    print("❌ Database connection failed:", e)
+    except Exception as e:
+        print("DB ERROR:", e)
+        return None, None
 
 # ---------------- AUTH ---------------- #
 
@@ -71,12 +69,14 @@ def load_user(user_id):
 
 # ---------------- HELPERS ---------------- #
 
-def fetch_df(query, params=()):
-    cursor.execute(query, params)
-    rows = cursor.fetchall()
+def fetch_df(query, params=None):
+    cursor, db = get_cursor()
+    if cursor is None:
+        return pd.DataFrame()
+    cursor.execute(query, params or ())
+    data = cursor.fetchall()
     columns = [col[0] for col in cursor.description]
-    return pd.DataFrame(rows, columns=columns)
-
+    return pd.DataFrame(data, columns=columns)
 # ---------------- AUTH ROUTES ---------------- #
 
 @app.route("/register", methods=["GET", "POST"])
@@ -137,13 +137,22 @@ def logout():
 @login_required
 def main():
     print("HOME ROUTE HIT")
+    cursor, db = get_cursor()
+    if cursor is None:
+        return "Database connection failed in main route"
+
     user_id = current_user.id
     now = datetime.now()
 
-    df = fetch_df(
-        "SELECT * FROM expenses WHERE user_id = %s",
-        (user_id,)
-    )
+    try:
+        df = fetch_df(
+            "SELECT * FROM expenses WHERE user_id = %s",
+            (user_id,)
+        )
+    except Exception as e:
+        print("FETCH ERROR:", e)
+        return "Error fetching data"
+    
     total = avg = count = 0
     max_amount, max_note = 0, "N/A"
     top_category = top_amount = low_category = low_amount = None
@@ -153,14 +162,17 @@ def main():
     predicted_expense = 0
     today_total = week_total = month_total = year_total = 0
     
-
     # Budget
-    cursor.execute(
-        "SELECT budget_amount FROM budget WHERE user_id = %s LIMIT 1",
-        (user_id,)
-    )
-    row = cursor.fetchone()
-    monthly_budget = row[0] if row else 0
+    try:
+        cursor.execute(
+            "SELECT budget_amount FROM budget WHERE user_id = %s LIMIT 1",
+            (user_id,)
+        )
+        row = cursor.fetchone()
+        monthly_budget = row[0] if row else 0
+    except Exception as e:
+        print("BUDGET ERROR:", e)
+        monthly_budget = 0
 
     if not df.empty:
         df["exp_date"] = pd.to_datetime(df["exp_date"])
