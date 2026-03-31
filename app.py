@@ -662,6 +662,11 @@ def compare_months():
         month2=month2
     )
 
+@app.route("/calculator", methods=["POST", "GET"])
+@login_required
+def calculator():
+    return render_template("calculator.html")
+
 
 # ---------------- RUN ---------------- #
 

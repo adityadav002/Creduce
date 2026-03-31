@@ -6,73 +6,112 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
     <title>Creduce</title>
   </head>
 
   <style>
-    * { font-family: 'DM Sans', sans-serif; }
+    * {
+      font-family: "DM Sans", sans-serif;
+    }
 
     /* ── Sidebar ── */
     #sidebar {
       position: fixed;
-      top: 0; left: 0;
+      top: 0;
+      left: 0;
       height: 100vh;
       width: 240px;
       background: #ffffff;
-      box-shadow: 4px 0 24px rgba(0,0,0,0.08);
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.08);
       z-index: 50;
       display: flex;
       flex-direction: column;
-      transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     /* Hidden off-screen on mobile by default */
     @media (max-width: 767px) {
-      #sidebar { transform: translateX(-100%); }
-      #sidebar.open { transform: translateX(0); }
+      #sidebar {
+        transform: translateX(-100%);
+      }
+      #sidebar.open {
+        transform: translateX(0);
+      }
     }
     /* Always visible on desktop */
     @media (min-width: 768px) {
-      #sidebar { transform: translateX(0) !important; position: relative; height: auto; flex-shrink: 0; }
+      #sidebar {
+        transform: translateX(0) !important;
+        position: relative;
+        height: auto;
+        flex-shrink: 0;
+      }
     }
 
     /* ── Overlay ── */
     #overlay {
       display: none;
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.3);
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.3);
       backdrop-filter: blur(2px);
       z-index: 40;
     }
-    #overlay.show { display: block; }
+    #overlay.show {
+      display: block;
+    }
 
     /* ── Nav links ── */
     .nav-link {
-      display: flex; align-items: center; gap: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
       padding: 10px 14px;
       border-radius: 12px;
-      font-size: 13.5px; font-weight: 500;
+      font-size: 13.5px;
+      font-weight: 500;
       color: #6b7280;
       text-decoration: none;
-      transition: background 0.15s, color 0.15s;
+      transition:
+        background 0.15s,
+        color 0.15s;
     }
-    .nav-link:hover { background: #f5e6d3; color: #c9773a; }
-    .nav-link.active { background: #f5e6d3; color: #c9773a; font-weight: 600; }
-    .nav-link svg { flex-shrink: 0; }
+    .nav-link:hover {
+      background: #f5e6d3;
+      color: #c9773a;
+    }
+    .nav-link.active {
+      background: #f5e6d3;
+      color: #c9773a;
+      font-weight: 600;
+    }
+    .nav-link svg {
+      flex-shrink: 0;
+    }
 
     .nav-section {
-      font-size: 10px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.09em;
-      color: #9ca3af; padding: 4px 14px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: #9ca3af;
+      padding: 4px 14px;
       margin-top: 4px;
     }
 
     /* ── Topbar ── */
     #topbar {
-      position: sticky; top: 0; z-index: 30;
+      position: sticky;
+      top: 0;
+      z-index: 30;
       background: #f0ebe1;
       padding: 14px 20px;
-      display: flex; align-items: center; justify-content: space-between;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       border-bottom: 1px solid #e8e0d6;
     }
 
@@ -80,16 +119,25 @@
     #menu-btn {
       display: none;
       background: #fff;
-      border: none; cursor: pointer;
-      width: 38px; height: 38px;
+      border: none;
+      cursor: pointer;
+      width: 38px;
+      height: 38px;
       border-radius: 10px;
-      align-items: center; justify-content: center;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
       transition: background 0.15s;
       flex-shrink: 0;
     }
-    #menu-btn:hover { background: #f5e6d3; }
-    @media (max-width: 767px) { #menu-btn { display: flex; } }
+    #menu-btn:hover {
+      background: #f5e6d3;
+    }
+    @media (max-width: 767px) {
+      #menu-btn {
+        display: flex;
+      }
+    }
 
     /* ── Layout wrapper ── */
     #layout {
@@ -97,7 +145,9 @@
       min-height: calc(100vh - 65px);
     }
     @media (min-width: 768px) {
-      #layout { gap: 0; }
+      #layout {
+        gap: 0;
+      }
     }
 
     /* ── Main content ── */
@@ -108,48 +158,72 @@
       /* On desktop, leave space for sidebar */
     }
     @media (min-width: 768px) {
-      #main-content { padding: 28px 28px; }
+      #main-content {
+        padding: 28px 28px;
+      }
     }
 
     /* ── Add btn ── */
     .add-btn {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: #c9773a; color: #fff;
-      padding: 7px 14px; border-radius: 10px;
-      font-size: 13px; font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #c9773a;
+      color: #fff;
+      padding: 7px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
       text-decoration: none;
       transition: opacity 0.15s;
     }
-    .add-btn:hover { opacity: 0.9; }
+    .add-btn:hover {
+      opacity: 0.9;
+    }
 
     /* Profile btn */
     .profile-btn {
-      width: 34px; height: 34px;
+      width: 34px;
+      height: 34px;
       border-radius: 10px;
       background: #fff;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07);
       transition: background 0.15s;
       text-decoration: none;
     }
-    .profile-btn:hover { background: #f5e6d3; }
+    .profile-btn:hover {
+      background: #f5e6d3;
+    }
 
     /* Close btn inside sidebar (mobile only) */
     #close-btn {
       display: none;
     }
     @media (max-width: 767px) {
-      #close-btn { display: flex; }
+      #close-btn {
+        display: flex;
+      }
     }
 
     /* Sidebar scroll */
-    #sidebar-nav { overflow-y: auto; flex: 1; padding: 8px 12px 20px; }
-    #sidebar-nav::-webkit-scrollbar { width: 3px; }
-    #sidebar-nav::-webkit-scrollbar-thumb { background: #ede8df; border-radius: 99px; }
+    #sidebar-nav {
+      overflow-y: auto;
+      flex: 1;
+      padding: 8px 12px 20px;
+    }
+    #sidebar-nav::-webkit-scrollbar {
+      width: 3px;
+    }
+    #sidebar-nav::-webkit-scrollbar-thumb {
+      background: #ede8df;
+      border-radius: 99px;
+    }
   </style>
 
   <body>
-
     <!-- ── Overlay (mobile) ── -->
     <div id="overlay" onclick="closeSidebar()"></div>
 
@@ -158,33 +232,97 @@
       <div class="flex items-center gap-3">
         <!-- Hamburger (mobile only) -->
         <button id="menu-btn" onclick="openSidebar()" aria-label="Open menu">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#c9773a" class="w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="#c9773a"
+            class="w-5 h-5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+            />
           </svg>
         </button>
         <!-- Logo -->
         <a href="/" class="flex items-center gap-2 text-decoration-none">
-          <div class="w-8 h-8 rounded-xl bg-amber-500 flex items-center justify-center flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#fff" class="w-4 h-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75" />
+          <div
+            class="w-8 h-8 rounded-xl bg-amber-500 flex items-center justify-center flex-shrink-0"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.8"
+              stroke="#fff"
+              class="w-4 h-4"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75"
+              />
             </svg>
           </div>
-          <span class="playfair font-bold text-xl text-gray-800 hidden sm:block">Creduce</span>
+          <span class="playfair font-bold text-xl text-gray-800 hidden sm:block"
+            >Creduce</span
+          >
         </a>
       </div>
 
       <!-- Right actions -->
       <div class="flex items-center gap-2">
         <a href="addExpense" class="add-btn">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2.5"
+            stroke="currentColor"
+            class="w-3.5 h-3.5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 4.5v15m7.5-7.5h-15"
+            />
           </svg>
           <span class="hidden sm:inline">Add Expense</span>
           <span class="sm:hidden">Add</span>
         </a>
+        <a href="calculator" class="profile-btn" title="Calculator">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="#6b7280"
+            class="w-4.5 h-4.5 w-5 h-5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V13.5Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V18Zm2.498-6.75h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V13.5Zm0 2.25h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V18Zm2.504-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5Zm0 2.25h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V18Zm2.498-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5ZM8.25 6h7.5v2.25h-7.5V6ZM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 0 0 2.25 2.25h10.5a2.25 2.25 0 0 0 2.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0 0 12 2.25Z"
+            />
+          </svg>
+        </a>
         <a href="profile" class="profile-btn" title="Profile">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="#6b7280" class="w-4.5 h-4.5 w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a8.25 8.25 0 0115 0" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.6"
+            stroke="#6b7280"
+            class="w-4.5 h-4.5 w-5 h-5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a8.25 8.25 0 0115 0"
+            />
           </svg>
         </a>
       </div>
@@ -192,27 +330,48 @@
 
     <!-- ── Main Layout ── -->
     <div id="layout">
-
       <!-- ── Sidebar ── -->
       <div id="sidebar">
-
         <!-- Sidebar Header -->
-          <!-- Close btn (mobile only) -->
-          <button id="close-btn" onclick="closeSidebar()"
-            class="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors border-none cursor-pointer">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#6b7280" class="w-4 h-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        
+        <!-- Close btn (mobile only) -->
+        <button
+          id="close-btn"
+          onclick="closeSidebar()"
+          class="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors border-none cursor-pointer"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="#6b7280"
+            class="w-4 h-4"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
 
         <!-- Nav Links -->
         <div id="sidebar-nav">
-
           <!-- Dashboard -->
           <a href="/" class="nav-link mt-1">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor" class="w-4 h-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.7"
+              stroke="currentColor"
+              class="w-4 h-4"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
+              />
             </svg>
             Dashboard
           </a>
@@ -221,22 +380,55 @@
           <p class="nav-section mt-3">Transactions</p>
 
           <a href="transaction_detail" class="nav-link">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor" class="w-4 h-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v16.5c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9Zm3.75 11.625a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.7"
+              stroke="currentColor"
+              class="w-4 h-4"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v16.5c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9Zm3.75 11.625a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"
+              />
             </svg>
             Transaction Details
           </a>
 
           <a href="transaction_analysis" class="nav-link">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor" class="w-4 h-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3zM6 6h.008v.008H6V6z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.7"
+              stroke="currentColor"
+              class="w-4 h-4"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3zM6 6h.008v.008H6V6z"
+              />
             </svg>
             Transaction Analysis
           </a>
 
           <a href="monthly_transaction" class="nav-link">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor" class="w-4 h-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.7"
+              stroke="currentColor"
+              class="w-4 h-4"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5m-9-6h.008v.008H12v-.008zM12 15h.008v.008H12V15zm0 2.25h.008v.008H12v-.008z"
+              />
             </svg>
             Monthly Transaction
           </a>
@@ -245,26 +437,58 @@
           <p class="nav-section mt-3">Filters & Reports</p>
 
           <a href="filter_transaction" class="nav-link">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor" class="w-4 h-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 13.5V3.75m0 9.75a1.5 1.5 0 010 3m0-3a1.5 1.5 0 000 3m0 3.75V16.5m12-3V3.75m0 9.75a1.5 1.5 0 010 3m0-3a1.5 1.5 0 000 3m0 3.75V16.5m-6-9V3.75m0 3.75a1.5 1.5 0 010 3m0-3a1.5 1.5 0 000 3m0 9.75V10.5" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.7"
+              stroke="currentColor"
+              class="w-4 h-4"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 13.5V3.75m0 9.75a1.5 1.5 0 010 3m0-3a1.5 1.5 0 000 3m0 3.75V16.5m12-3V3.75m0 9.75a1.5 1.5 0 010 3m0-3a1.5 1.5 0 000 3m0 3.75V16.5m-6-9V3.75m0 3.75a1.5 1.5 0 010 3m0-3a1.5 1.5 0 000 3m0 9.75V10.5"
+              />
             </svg>
             Filter Transactions
           </a>
 
           <a href="compare_months" class="nav-link">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor" class="w-4 h-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.7"
+              stroke="currentColor"
+              class="w-4 h-4"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"
+              />
             </svg>
             Compare Months
           </a>
-
         </div>
 
         <!-- Sidebar Footer -->
         <div class="px-4 py-4 border-t border-gray-100">
           <a href="profile" class="nav-link">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor" class="w-4 h-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a8.25 8.25 0 0115 0" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.7"
+              stroke="currentColor"
+              class="w-4 h-4"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a8.25 8.25 0 0115 0"
+              />
             </svg>
             Profile
           </a>
@@ -272,41 +496,37 @@
       </div>
 
       <!-- ── Page Content ── -->
-      <div id="main-content">
-        {% block content %}{% endblock %}
-      </div>
-
-    </div><!-- /layout -->
-
+      <div id="main-content">{% block content %}{% endblock %}</div>
+    </div>
+    <!-- /layout -->
   </body>
 
   <script>
     function openSidebar() {
-      document.getElementById('sidebar').classList.add('open');
-      document.getElementById('overlay').classList.add('show');
-      document.body.style.overflow = 'hidden';
+      document.getElementById("sidebar").classList.add("open");
+      document.getElementById("overlay").classList.add("show");
+      document.body.style.overflow = "hidden";
     }
     function closeSidebar() {
-      document.getElementById('sidebar').classList.remove('open');
-      document.getElementById('overlay').classList.remove('show');
-      document.body.style.overflow = '';
+      document.getElementById("sidebar").classList.remove("open");
+      document.getElementById("overlay").classList.remove("show");
+      document.body.style.overflow = "";
     }
 
     // Close sidebar on nav link click (mobile)
     if (window.innerWidth < 768) {
-      document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', closeSidebar);
+      document.querySelectorAll(".nav-link").forEach((link) => {
+        link.addEventListener("click", closeSidebar);
       });
     }
 
     // Highlight active link based on current path
-    const currentPath = window.location.pathname.replace('/', '') || '/';
-    document.querySelectorAll('.nav-link').forEach(link => {
-      const href = link.getAttribute('href');
-      if (href === currentPath || (href === '/' && currentPath === '/')) {
-        link.classList.add('active');
+    const currentPath = window.location.pathname.replace("/", "") || "/";
+    document.querySelectorAll(".nav-link").forEach((link) => {
+      const href = link.getAttribute("href");
+      if (href === currentPath || (href === "/" && currentPath === "/")) {
+        link.classList.add("active");
       }
     });
   </script>
-
 </html>
