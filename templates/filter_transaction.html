@@ -134,7 +134,7 @@
             Category
           </label>
           <select name="category" id="category" class="filter-select">
-            <option value="">All Categories</option>
+            <option value="" disabled {% if not request.args.get('category')             %}selected{% endif %}>Select Category</option>
             <option value="all"    {% if request.args.get('category') == 'all'           %}selected{% endif %}>All Category</option>
             <option value="food"   {% if request.args.get('category') == 'food'          %}selected{% endif %}>Food</option>
             <option value="groceries" {% if request.args.get('category') == 'groceries'  %}selected{% endif %}>Groceries</option>
@@ -158,7 +158,7 @@
             Month
           </label>
           <select name="month" id="month" class="filter-select">
-            <option value="">All Months</option>
+            <option value="" disabled {% if not request.args.get('month')             %}selected{% endif %}>Select Month</option>
             <option value="all" {% if request.args.get('month') == 'all' %}selected{% endif %}>All Months</option>
             {% set months = [('1','January'),('2','February'),('3','March'),('4','April'),('5','May'),('6','June'),('7','July'),('8','August'),('9','September'),('10','October'),('11','November'),('12','December')] %}
             {% for val, label in months %}
@@ -176,7 +176,7 @@
             Payment
           </label>
           <select name="payment" id="payment" class="filter-select">
-            <option value="">All Payments</option>
+            <option value="" disabled {% if not request.args.get('payment')             %}selected{% endif %}>Select Payment</option>
             <option value="all"         {% if request.args.get('payment') == 'all'         %}selected{% endif %}>All Payment</option>
             <option value="cash"        {% if request.args.get('payment') == 'cash'        %}selected{% endif %}>Cash</option>
             <option value="upi"         {% if request.args.get('payment') == 'upi'         %}selected{% endif %}>UPI</option>

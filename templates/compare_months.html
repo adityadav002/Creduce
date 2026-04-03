@@ -114,6 +114,12 @@
               <option value="{{ i }}" {% if month1 == i|string %}selected{% endif %}>{{ m }}</option>
             {% endfor %}
           </select>
+          <select name="year1" class="filter-select">
+            <option value="">Select Year</option>
+            {% for y in range(2023, 2031) %}
+              <option value="{{ y }}" {% if year1 == y|string %}selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+          </select>
         </div>
 
         <!-- Month 2 -->
@@ -127,6 +133,12 @@
             {% for i, m in [(1,"January"),(2,"February"),(3,"March"),(4,"April"),(5,"May"),(6,"June"),
                             (7,"July"),(8,"August"),(9,"September"),(10,"October"),(11,"November"),(12,"December")] %}
               <option value="{{ i }}" {% if month2 == i|string %}selected{% endif %}>{{ m }}</option>
+            {% endfor %}
+          </select>
+          <select name="year2" class="filter-select">
+            <option value="">Select Year</option>
+            {% for y in range(2023, 2031) %}
+              <option value="{{ y }}" {% if year2 == y|string %}selected{% endif %}>{{ y }}</option>
             {% endfor %}
           </select>
         </div>

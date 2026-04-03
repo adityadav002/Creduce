@@ -206,6 +206,7 @@ def main():
     
     # Get labels
     today_label = now.strftime("%b %d, %Y")
+    current_month = now.strftime("%B")
     start_of_week = now - timedelta(days=now.weekday())
     end_of_week = start_of_week + timedelta(days=6)
     week_range = f"{start_of_week.strftime('%b %d')} – {end_of_week.strftime('%b %d')}"
@@ -321,7 +322,8 @@ def main():
         today_label=today_label,
         week_range=week_range,
         month_range=month_range,
-        year_label=year_label
+        year_label=year_label,
+        current_month=current_month
     )
 
 
@@ -535,30 +537,37 @@ def filter_transaction():
     cursor, db = get_cursor()
     if cursor is None:
         return "Database connection failed"
-    
+
     try:
-        # Base query
+        # If no filters → show empty state
+        if not category and not month and not payment:
+            return render_template("filter_transaction.html", data=[])
+
         query = "SELECT * FROM expenses WHERE user_id = %s"
         params = [user_id]
-        
-        # Apply filters dynamically
+
+        # Only add category filter if it's NOT "all"
         if category and category != "all":
             query += " AND category = %s"
             params.append(category)
+
+        # Only add payment filter if it's NOT "all"
         if payment and payment != "all":
             query += " AND pay_method = %s"
             params.append(payment)
+
+        # Only add month filter if it's NOT "all"
         if month and month != "all":
             query += " AND MONTH(exp_date) = %s"
             params.append(int(month))
 
         query += " ORDER BY exp_date DESC"
 
-        # Execute query
         cursor.execute(query, tuple(params))
         data = cursor.fetchall()
+
         return render_template("filter_transaction.html", data=data)
-    
+
     finally:
         cursor.close()
         db.close()
@@ -625,31 +634,46 @@ def compare_months():
     user_id = current_user.id
     month1 = request.args.get("month1")
     month2 = request.args.get("month2")
+    year1 = request.args.get("year1")
+    year2 = request.args.get("year2")
     
     df = fetch_df(
-        "SELECT * FROM expenses WHERE user_id = %s",
-        (user_id,)
+        """
+        SELECT * FROM expenses 
+        WHERE user_id = %s 
+        AND (
+            (MONTH(exp_date) = %s AND YEAR(exp_date) = %s)
+            OR
+            (MONTH(exp_date) = %s AND YEAR(exp_date) = %s)
+        )
+        """,
+        (user_id, month1, year1, month2, year2)
     )
     
     labels = []
     m1_data = []
     m2_data = []
 
-    if not df.empty and month1 and month2:
+    if not df.empty and month1 and month2 and year1 and year2:
         df["exp_date"] = pd.to_datetime(df["exp_date"])
         
-        # Filter both months
-        m1_df = df[df["exp_date"].dt.month == int(month1)]
-        m2_df = df[df["exp_date"].dt.month == int(month2)]
+        # Filter by BOTH month and year
+        m1_df = df[
+            (df["exp_date"].dt.month == int(month1)) &
+            (df["exp_date"].dt.year == int(year1))
+        ]
+        
+        m2_df = df[
+            (df["exp_date"].dt.month == int(month2)) &
+            (df["exp_date"].dt.year == int(year2))
+        ]
         
         # Group by DAY
         m1_group = m1_df.groupby(m1_df["exp_date"].dt.day)["amount"].sum()
         m2_group = m2_df.groupby(m2_df["exp_date"].dt.day)["amount"].sum()
         
-        # Days (1–31)
         labels = list(range(1, 32))
         
-        # Fill missing days with 0
         m1_data = [float(m1_group.get(day, 0)) for day in labels]
         m2_data = [float(m2_group.get(day, 0)) for day in labels]
 
@@ -659,7 +683,9 @@ def compare_months():
         m1_data=m1_data,
         m2_data=m2_data,
         month1=month1,
-        month2=month2
+        month2=month2,
+        year1=year1,
+        year2=year2
     )
 
 @app.route("/calculator", methods=["POST", "GET"])
