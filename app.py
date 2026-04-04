@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 import mysql.connector
 import pandas as pd
 import numpy as np
@@ -159,7 +159,7 @@ def login():
                 print(f"✅ User logged in: {user[1]}")
                 return redirect("/")
 
-            return "Invalid credentials"
+            return redirect(url_for("login"))
         
         finally:
             cursor.close()
@@ -206,7 +206,7 @@ def main():
     
     # Get labels
     today_label = now.strftime("%b %d, %Y")
-    current_month = now.strftime("%B")
+    current_month_name = now.strftime("%B")
     start_of_week = now - timedelta(days=now.weekday())
     end_of_week = start_of_week + timedelta(days=6)
     week_range = f"{start_of_week.strftime('%b %d')} – {end_of_week.strftime('%b %d')}"
@@ -289,10 +289,25 @@ def main():
         pred_df = df.copy()
         pred_df["exp_date"] = pd.to_datetime(pred_df["exp_date"])
 
-        # group by month properly
+        pred_df["amount"] = (pred_df["amount"]
+                            .astype(str)
+                            .str.replace("₹", "", regex=False)
+                            .str.replace(",", "", regex=False)
+                            .astype(float)
+                            )    
+
         monthly_pred = pred_df.resample("ME", on="exp_date")["amount"].sum().reset_index()
 
-        # create time index
+        current_month = pd.Timestamp.now().month
+        current_year = pd.Timestamp.now().year
+
+        monthly_pred = monthly_pred[
+            ~(
+                (monthly_pred["exp_date"].dt.month == current_month) &
+                (monthly_pred["exp_date"].dt.year == current_year)
+            )
+        ]
+
         monthly_pred["t"] = range(len(monthly_pred))
 
         if len(monthly_pred) >= 2:
@@ -301,6 +316,9 @@ def main():
 
             next_t = np.array([[monthly_pred["t"].max() + 1]])
             predicted_expense = int(model.predict(next_t)[0])
+
+            print("MONTHLY PRED DATA:")
+            print(monthly_pred)
         else:
             predicted_expense = 0
 
@@ -327,7 +345,7 @@ def main():
         week_range=week_range,
         month_range=month_range,
         year_label=year_label,
-        current_month=current_month
+        current_month_name=current_month_name
     )
 
 
