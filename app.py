@@ -287,18 +287,22 @@ def main():
 
         # Prediction
         pred_df = df.copy()
-        pred_df["month"] = pred_df["exp_date"].dt.month
-        monthly_pred = pred_df.groupby("month")["amount"].sum().reset_index()
+        pred_df["exp_date"] = pd.to_datetime(pred_df["exp_date"])
+
+        # group by month properly
+        monthly_pred = pred_df.resample("ME", on="exp_date")["amount"].sum().reset_index()
+
+        # create time index
+        monthly_pred["t"] = range(len(monthly_pred))
 
         if len(monthly_pred) >= 2:
-            try:
-                model_lr = LinearRegression()
-                model_lr.fit(monthly_pred[["month"]], monthly_pred["amount"])
+            model = LinearRegression()
+            model.fit(monthly_pred[["t"]], monthly_pred["amount"])
 
-                next_month = np.array([[monthly_pred["month"].max() + 1]])
-                predicted_expense = int(model_lr.predict(next_month)[0])
-            except:
-                predicted_expense = 0
+            next_t = np.array([[monthly_pred["t"].max() + 1]])
+            predicted_expense = int(model.predict(next_t)[0])
+        else:
+            predicted_expense = 0
 
     return render_template(
         "dashboard.html",
