@@ -7,6 +7,8 @@ from services.expense_service import (
     update_expense,
     get_expense_by_id
 )
+from services.account_service import get_all_accounts
+from services.category_service import get_all_categories
 
 expense_bp = Blueprint("expense", __name__)
 
@@ -17,18 +19,28 @@ def add_expense_route():
 
     if request.method == "POST":
 
+        # Sanitize: treat empty strings as None
+        category_val = request.form.get("category") or None
+        subcategory_val = request.form.get("subcategory_id") or None
+        new_subcategory = request.form.get("new_subcategory", "").strip()
+
         add_expense(
             current_user.id,
+            request.form["account_id"],
             request.form["exp_date"],
             float(request.form["amount"]),
             request.form.get("note", "").lower(),
             request.form["payment"],
-            request.form.get("category")
+            category_val,
+            subcategory_val,
+            new_subcategory
         )
 
         return redirect("/")
 
-    return render_template("addExpense.html")
+    accounts = get_all_accounts(current_user.id)
+    categories = get_all_categories(current_user.id)
+    return render_template("addExpense.html", accounts=accounts, categories=categories)
 
 
 @expense_bp.route("/deleteExpense", methods=["POST"])
@@ -51,10 +63,15 @@ def edit_expense(id):
         id,
         current_user.id
     )
+    
+    accounts = get_all_accounts(current_user.id)
+    categories = get_all_categories(current_user.id)
 
     return render_template(
         "editExpense.html",
-        expense=expense
+        expense=expense,
+        accounts=accounts,
+        categories=categories
     )
 
 
@@ -62,14 +79,22 @@ def edit_expense(id):
 @login_required
 def update_expense_route():
 
+    # Sanitize: treat empty strings as None
+    category_val = request.form.get("category") or None
+    subcategory_val = request.form.get("subcategory_id") or None
+    new_subcategory = request.form.get("new_subcategory", "").strip()
+
     update_expense(
         request.form["id"],
         current_user.id,
+        request.form["account_id"],
         request.form["exp_date"],
-        request.form["category"],
-        request.form["amount"],
+        category_val,
+        float(request.form["amount"]),
         request.form["note"],
-        request.form["payment"]
+        request.form["payment"],
+        subcategory_val,
+        new_subcategory
     )
 
     return redirect("/")

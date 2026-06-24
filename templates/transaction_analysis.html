@@ -1,24 +1,55 @@
 {% extends "layout.html" %}
 {% block content %}
 
+<!--
+  CHANGES IN THIS FILE (see inline comments at each spot for detail):
+  1. Donut chart / legend JS: added a defensive Number() cast on parsed
+     values (belt-and-suspenders alongside the real backend fix in
+     analysis_service.py, which is what actually resolves "always 0%").
+  2. THIRD ROW added: three new cards - "Top Subcategories",
+     "Spending By Account", "Payment Methods" - styled with the same
+     card/spacing/animation/progress-bar patterns already used above.
+  3. No existing card, color, layout, or chart was removed or redesigned.
+
+  NOTE: this template now expects 3 additional context variables -
+  subcategory_totals_dict, account_totals_dict, payment_totals_dict -
+  on top of the existing category_totals_dict and month_amounts.
+  These come from transaction_analysis_service() in analysis_service.py,
+  which now returns 5 values instead of 2. The route that renders this
+  template (not part of this change set) needs to pass all 5 through to
+  render_template() for these new cards to populate.
+-->
+
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+<link
+  href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+  rel="stylesheet" />
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-  * { font-family: 'DM Sans', sans-serif; }
-  .playfair { font-family: 'Playfair Display', serif; }
+  * {
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .playfair {
+    font-family: 'Playfair Display', serif;
+  }
 
   .card {
     background: #ffffff;
     border-radius: 20px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
   }
 
-  .expense-text { color: #e76f51; }
-  .accent-text  { color: #c9773a; }
+  .expense-text {
+    color: #e76f51;
+  }
+
+  .accent-text {
+    color: #c9773a;
+  }
 
   /* Progress bar */
   .progress-track {
@@ -28,30 +59,45 @@
     overflow: hidden;
     flex: 1;
   }
+
   .progress-fill {
     height: 100%;
     border-radius: 99px;
-    transition: width 1s cubic-bezier(.4,0,.2,1);
+    transition: width 1s cubic-bezier(.4, 0, .2, 1);
   }
 
   /* Color dot */
   .color-dot {
-    width: 10px; height: 10px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     flex-shrink: 0;
   }
 
   @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(14px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-  .fade-up { animation: fadeUp 0.45s ease both; }
+
+  .fade-up {
+    animation: fadeUp 0.45s ease both;
+  }
 
   /* Stat chip */
   .stat-chip {
-    background: #f5e6d3; color: #c9773a;
-    padding: 3px 10px; border-radius: 99px;
-    font-size: 11px; font-weight: 600;
+    background: #f5e6d3;
+    color: #c9773a;
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 600;
     display: inline-block;
   }
 </style>
@@ -75,7 +121,8 @@
           <h2 class="text-lg font-bold text-gray-800">Spending Split</h2>
         </div>
         <div class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="#c9773a" class="w-5 h-5">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="#c9773a"
+            class="w-5 h-5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" />
             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" />
           </svg>
@@ -99,8 +146,10 @@
           <h2 class="text-lg font-bold text-gray-800">By Category</h2>
         </div>
         <div class="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="#e76f51" class="w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="#e76f51"
+            class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
           </svg>
         </div>
       </div>
@@ -110,7 +159,7 @@
   </div>
 
   <!-- BOTTOM ROW: Monthly Bar Chart + Monthly Summary -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
 
     <!-- Monthly Bar Chart (takes 2/3 width on large screens) -->
     <div class="card p-6 fade-up lg:col-span-2" style="animation-delay:0.18s">
@@ -120,8 +169,10 @@
           <h2 class="text-lg font-bold text-gray-800">Monthly Spending</h2>
         </div>
         <div class="w-9 h-9 rounded-xl bg-teal-50 flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="#2a9d8f" class="w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="#2a9d8f"
+            class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
           </svg>
         </div>
       </div>
@@ -142,16 +193,86 @@
 
   </div>
 
+  <!-- ============================================================ -->
+  <!-- NEW: THIRD ROW - Top Subcategories / Spending By Account /
+       Payment Methods. Same grid/card/fade-up/animation-delay pattern
+       as the rows above (just continuing the existing 0.06s-increment
+       stagger), so the new row blends in with the existing layout
+       rather than introducing a new visual style. -->
+  <!-- ============================================================ -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+    <!-- NEW: Top Subcategories Card -->
+    <div class="card p-6 fade-up" style="animation-delay:0.30s">
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <p class="text-xs text-gray-400 uppercase tracking-widest font-medium mb-0.5">Ranked</p>
+          <h2 class="text-lg font-bold text-gray-800">Top Subcategories</h2>
+        </div>
+        <div class="w-9 h-9 rounded-xl bg-pink-50 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="#D4537E"
+            class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z" />
+          </svg>
+        </div>
+      </div>
+      <!-- Populated by JS below, ranked badge + progress bar, mirroring
+           the existing "Monthly Summary List" item structure. -->
+      <div id="top-subcat-list" class="flex flex-col gap-3"></div>
+    </div>
+
+    <!-- NEW: Spending By Account Card -->
+    <div class="card p-6 fade-up" style="animation-delay:0.36s">
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <p class="text-xs text-gray-400 uppercase tracking-widest font-medium mb-0.5">Breakdown</p>
+          <h2 class="text-lg font-bold text-gray-800">Spending By Account</h2>
+        </div>
+        <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="#378ADD"
+            class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M2.25 21h19.5M2.25 9l9-6 9 6M4.5 9v9m15-9v9M9 21v-4.5a1.5 1.5 0 011.5-1.5h3a1.5 1.5 0 011.5 1.5V21" />
+          </svg>
+        </div>
+      </div>
+      <div id="account-bars" class="flex flex-col gap-4"></div>
+    </div>
+
+    <!-- NEW: Payment Methods Card -->
+    <div class="card p-6 fade-up" style="animation-delay:0.42s">
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <p class="text-xs text-gray-400 uppercase tracking-widest font-medium mb-0.5">Breakdown</p>
+          <h2 class="text-lg font-bold text-gray-800">Payment Methods</h2>
+        </div>
+        <div class="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="#7F77DD"
+            class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+          </svg>
+        </div>
+      </div>
+      <!-- Populated by JS below - same color-dot + progress-bar pattern
+           as the other breakdown cards. -->
+      <div id="payment-bars" class="flex flex-col gap-4"></div>
+    </div>
+
+  </div>
+
 </div>
 
 <script>
-  const CAT_COLORS = ['#c9773a','#2a9d8f','#e76f51','#378ADD','#7F77DD','#D4537E','#639922','#BA7517'];
+  const CAT_COLORS = ['#c9773a', '#2a9d8f', '#e76f51', '#378ADD', '#7F77DD', '#D4537E', '#639922', '#BA7517'];
 
   /* ── Category Donut ── */
-  const categoryData  = {{ category_totals_dict | tojson }};
-  const labels        = Object.keys(categoryData);
-  const values        = Object.values(categoryData);
-  const grandTotal    = values.reduce((a, b) => a + b, 0);
+  const categoryData = {{ category_totals_dict | tojson }};
+  const labels = Object.keys(categoryData);
+  const values = Object.values(categoryData).map(Number);
+  const grandTotal = values.reduce((a, b) => a + b, 0);
 
   const ctx = document.getElementById('categoryChart');
   new Chart(ctx, {
@@ -193,7 +314,7 @@
   });
 
   /* ── Category Progress Bars ── */
-  const maxCat = Math.max(...values);
+  const maxCat = values.length ? Math.max(...values) : 0;
   const catBarsEl = document.getElementById('cat-bars');
   labels.forEach((c, i) => {
     const pct = maxCat > 0 ? Math.round(values[i] / maxCat * 100) : 0;
@@ -219,11 +340,92 @@
     });
   });
 
+  const subcategoryData = {{ subcategory_totals_dict | tojson }};
+  const subcatLabels = Object.keys(subcategoryData);
+  const subcatValues = Object.values(subcategoryData).map(Number);
+  const TOP_SUBCAT_COUNT = 5;
+  const topSubcatLabels = subcatLabels.slice(0, TOP_SUBCAT_COUNT);
+  const topSubcatValues = subcatValues.slice(0, TOP_SUBCAT_COUNT);
+  const maxSubcat = topSubcatValues.length ? Math.max(...topSubcatValues) : 0;
+  const topSubcatEl = document.getElementById('top-subcat-list');
+  topSubcatLabels.forEach((name, i) => {
+    const val = topSubcatValues[i];
+    const pct = maxSubcat > 0 ? Math.round(val / maxSubcat * 100) : 0;
+    topSubcatEl.innerHTML += `
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold text-white"
+             style="background:${CAT_COLORS[i % CAT_COLORS.length]}">
+          ${i + 1}
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between mb-1">
+            <span class="text-xs font-semibold text-gray-600 truncate">${name}</span>
+            <span class="text-xs font-bold text-gray-800">₹${val.toLocaleString()}</span>
+          </div>
+          <div class="progress-track" style="height:5px">
+            <div class="progress-fill" style="width:0%;background:${CAT_COLORS[i % CAT_COLORS.length]}" data-target="${pct}"></div>
+          </div>
+        </div>
+      </div>`;
+  });
+
+  const accountData = {{ account_totals_dict | tojson }};
+  const accountLabels = Object.keys(accountData);
+  const accountValues = Object.values(accountData).map(Number);
+  const maxAccount = accountValues.length ? Math.max(...accountValues) : 0;
+  const accountBarsEl = document.getElementById('account-bars');
+  accountLabels.forEach((name, i) => {
+    const pct = maxAccount > 0 ? Math.round(accountValues[i] / maxAccount * 100) : 0;
+    accountBarsEl.innerHTML += `
+      <div>
+        <div class="flex items-center justify-between mb-1.5">
+          <div class="flex items-center gap-2">
+            <span class="color-dot" style="background:${CAT_COLORS[i % CAT_COLORS.length]}"></span>
+            <span class="text-sm font-semibold text-gray-700">${name}</span>
+          </div>
+          <span class="text-sm font-bold" style="color:${CAT_COLORS[i % CAT_COLORS.length]}">₹${accountValues[i].toLocaleString()}</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width:0%;background:${CAT_COLORS[i % CAT_COLORS.length]}" data-target="${pct}"></div>
+        </div>
+      </div>`;
+  });
+
+  const paymentData = {{ payment_totals_dict | tojson }};
+  const paymentLabels = Object.keys(paymentData);
+  const paymentValues = Object.values(paymentData).map(Number);
+  const maxPayment = paymentValues.length ? Math.max(...paymentValues) : 0;
+  const paymentBarsEl = document.getElementById('payment-bars');
+  paymentLabels.forEach((name, i) => {
+    const pct = maxPayment > 0 ? Math.round(paymentValues[i] / maxPayment * 100) : 0;
+    paymentBarsEl.innerHTML += `
+      <div>
+        <div class="flex items-center justify-between mb-1.5">
+          <div class="flex items-center gap-2">
+            <span class="color-dot" style="background:${CAT_COLORS[i % CAT_COLORS.length]}"></span>
+            <span class="text-sm font-semibold text-gray-700">${name}</span>
+          </div>
+          <span class="text-sm font-bold" style="color:${CAT_COLORS[i % CAT_COLORS.length]}">₹${paymentValues[i].toLocaleString()}</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width:0%;background:${CAT_COLORS[i % CAT_COLORS.length]}" data-target="${pct}"></div>
+        </div>
+      </div>`;
+  });
+
+  /* Animate the three new sections' bars after paint (same technique as
+     the existing category-bars animation above). */
+  requestAnimationFrame(() => {
+    document.querySelectorAll('#top-subcat-list .progress-fill[data-target], #account-bars .progress-fill[data-target], #payment-bars .progress-fill[data-target]').forEach(el => {
+      setTimeout(() => { el.style.width = el.dataset.target + '%'; }, 100);
+    });
+  });
+
   /* ── Monthly Bar Chart ── */
-  const monthlyData   = {{ month_amounts | tojson }};
-  const monthlyLabel  = Object.keys(monthlyData);
-  const monthlyValue  = Object.values(monthlyData);
-  const BAR_COLORS    = ['#c9773a','#2a9d8f','#e76f51','#378ADD','#7F77DD','#D4537E','#639922','#BA7517','#4BC0C0','#9966FF','#FF9F40','#8BC34A'];
+  const monthlyData = {{ month_amounts | tojson }};
+  const monthlyLabel = Object.keys(monthlyData);
+  const monthlyValue = Object.values(monthlyData).map(Number);
+  const BAR_COLORS = ['#c9773a', '#2a9d8f', '#e76f51', '#378ADD', '#7F77DD', '#D4537E', '#639922', '#BA7517', '#4BC0C0', '#9966FF', '#FF9F40', '#8BC34A'];
 
   const mtx = document.getElementById('monthBar');
   new Chart(mtx, {
@@ -269,14 +471,14 @@
 
   /* ── Monthly Summary List ── */
   const monthListEl = document.getElementById('monthly-list');
-  const maxMonth    = Math.max(...monthlyValue);
+  const maxMonth = monthlyValue.length ? Math.max(...monthlyValue) : 0;
   monthlyLabel.forEach((m, i) => {
     const pct = maxMonth > 0 ? Math.round(monthlyValue[i] / maxMonth * 100) : 0;
     monthListEl.innerHTML += `
       <div class="flex items-center gap-3">
         <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold text-white"
              style="background:${BAR_COLORS[i % BAR_COLORS.length]}">
-          ${m.slice(0,3)}
+          ${m.slice(0, 3)}
         </div>
         <div class="flex-1 min-w-0">
           <div class="flex justify-between mb-1">
@@ -290,7 +492,6 @@
       </div>`;
   });
 
-  /* Animate monthly bars */
   requestAnimationFrame(() => {
     document.querySelectorAll('.progress-fill[data-target]').forEach(el => {
       setTimeout(() => { el.style.width = el.dataset.target + '%'; }, 150);

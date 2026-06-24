@@ -188,7 +188,7 @@ texts = [
     "come from indore",
     "coming",
     "going",
-    "journey"
+    "journey",
 
     # ── Clothing ─────────────────────────────
     "buy shoes",
@@ -598,8 +598,8 @@ cv_scores = cross_val_score(pipeline, texts, labels, cv=5, scoring="accuracy")
 print(f"📊 Cross-val accuracy: {cv_scores.mean():.2%} ± {cv_scores.std():.2%}")
 
 pipeline.fit(texts, labels)
-joblib.dump(pipeline, "trained_model.pkl")
-print("✅ Model trained and saved → expense_classifier.pkl")
+joblib.dump(pipeline, "ml/trained_model.pkl")
+print("Model trained and saved -> ml/trained_model.pkl")
 
 # ─────────────────────────────────────────────
 #  SMOKE TESTS

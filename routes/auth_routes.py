@@ -14,15 +14,18 @@ auth_bp = Blueprint("auth", __name__)
 def register():
 
     if request.method == "POST":
-
-        success = register_user(
-            request.form["name"],
-            request.form["email"],
-            request.form["password"]
-        )
+        try:
+            success = register_user(
+                request.form["name"],
+                request.form["email"],
+                request.form["password"]
+            )
+        except ValueError as exc:
+            return render_template("register.html", error=str(exc)), 400
 
         if success:
             return redirect("/login")
+        return render_template("register.html", error="That email is already registered."), 409
 
     return render_template("register.html")
 
@@ -32,16 +35,19 @@ def login():
 
     if request.method == "POST":
 
-        user_data = authenticate_user(
-            request.form["email"],
-            request.form["password"]
-        )
+        try:
+            user_data = authenticate_user(
+                request.form["email"],
+                request.form["password"]
+            )
+        except ValueError as exc:
+            return render_template("login.html", error=str(exc)), 400
 
         if user_data:
             login_user(User(user_data[0]))
             return redirect("/")
 
-        return redirect(url_for("auth.login"))
+        return render_template("login.html", error="Invalid email or password."), 401
 
     return render_template("login.html")
 

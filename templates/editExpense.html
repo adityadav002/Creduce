@@ -1,24 +1,35 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" href="../static/images/favicon.ico" type="image/x-icon">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+    rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <title>Creduce · Edit Expense</title>
 
   <style>
-    * { font-family: 'DM Sans', sans-serif; }
-    .playfair { font-family: 'Playfair Display', serif; }
-    body { background-color: #f0ebe1; }
+    * {
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .playfair {
+      font-family: 'Playfair Display', serif;
+    }
+
+    body {
+      background-color: #f0ebe1;
+    }
 
     .card {
       background: #fff;
       border-radius: 24px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
     }
 
     /* Input / Select */
@@ -33,11 +44,15 @@
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
+
     .field:focus {
       border-color: #c9773a;
-      box-shadow: 0 0 0 3px rgba(201,119,58,0.12);
+      box-shadow: 0 0 0 3px rgba(201, 119, 58, 0.12);
     }
-    .field::placeholder { color: #9ca3af; }
+
+    .field::placeholder {
+      color: #9ca3af;
+    }
 
     select.field {
       appearance: none;
@@ -50,60 +65,133 @@
       cursor: pointer;
     }
 
-    textarea.field { padding-left: 14px; resize: none; }
-
-    .field-wrap { position: relative; }
-    .field-icon {
-      position: absolute; left: 13px; top: 50%;
-      transform: translateY(-50%); pointer-events: none;
+    textarea.field {
+      padding-left: 14px;
+      resize: none;
     }
+
+    .field-wrap {
+      position: relative;
+    }
+
+    .field-icon {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
     .field-icon-top {
-      position: absolute; left: 13px; top: 13px; pointer-events: none;
+      position: absolute;
+      left: 13px;
+      top: 13px;
+      pointer-events: none;
     }
 
     .field-label {
-      font-size: 11px; font-weight: 600; color: #9ca3af;
-      text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px;
-      display: flex; align-items: center; gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
 
-    .divider { border: none; border-top: 1.5px solid #f5f0ea; margin: 4px 0; }
+    .divider {
+      border: none;
+      border-top: 1.5px solid #f5f0ea;
+      margin: 4px 0;
+    }
 
     /* Buttons */
     .btn-submit {
-      width: 100%; background: #c9773a; color: #fff;
-      padding: 13px; border-radius: 12px;
-      font-size: 15px; font-weight: 700; border: none; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 7px;
-      transition: opacity 0.15s, transform 0.1s; letter-spacing: 0.01em;
+      width: 100%;
+      background: #c9773a;
+      color: #fff;
+      padding: 13px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      transition: opacity 0.15s, transform 0.1s;
+      letter-spacing: 0.01em;
     }
-    .btn-submit:hover  { opacity: 0.92; }
-    .btn-submit:active { transform: scale(0.98); }
+
+    .btn-submit:hover {
+      opacity: 0.92;
+    }
+
+    .btn-submit:active {
+      transform: scale(0.98);
+    }
 
     .btn-cancel {
-      width: 100%; background: #f5f0ea; color: #9ca3af;
-      padding: 13px; border-radius: 12px;
-      font-size: 14px; font-weight: 600; border: none; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-      transition: background 0.15s; text-decoration: none;
+      width: 100%;
+      background: #f5f0ea;
+      color: #9ca3af;
+      padding: 13px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.15s;
+      text-decoration: none;
     }
-    .btn-cancel:hover { background: #ede8df; }
+
+    .btn-cancel:hover {
+      background: #ede8df;
+    }
 
     /* Back link */
     .back-link {
-      display: inline-flex; align-items: center; gap: 6px;
-      color: #9ca3af; font-size: 13px; font-weight: 500;
-      text-decoration: none; padding: 7px 12px; border-radius: 10px;
-      background: #fff; box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #9ca3af;
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      padding: 7px 12px;
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
       transition: background 0.15s, color 0.15s;
     }
-    .back-link:hover { background: #f5e6d3; color: #c9773a; }
+
+    .back-link:hover {
+      background: #f5e6d3;
+      color: #c9773a;
+    }
 
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
-    .fade-up { animation: fadeUp 0.45s ease both; }
+
+    .fade-up {
+      animation: fadeUp 0.45s ease both;
+    }
   </style>
 </head>
 
@@ -111,19 +199,18 @@
 
   <!-- bg blobs -->
   <div class="fixed top-0 left-0 w-72 h-72 rounded-full pointer-events-none"
-       style="background:rgba(201,119,58,0.07); transform:translate(-40%,-40%)"></div>
+    style="background:rgba(201,119,58,0.07); transform:translate(-40%,-40%)"></div>
   <div class="fixed bottom-0 right-0 w-96 h-96 rounded-full pointer-events-none"
-       style="background:rgba(201,119,58,0.05); transform:translate(30%,30%)"></div>
+    style="background:rgba(201,119,58,0.05); transform:translate(30%,30%)"></div>
 
   <div class="w-full max-w-md fade-up">
 
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
       <a href="javascript:history.back()" class="back-link">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-          stroke-width="2" stroke="currentColor" class="w-4 h-4">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+          class="w-4 h-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
         </svg>
         Back
       </a>
@@ -143,28 +230,53 @@
 
       <div class="p-7">
 
-        <form action="/updateExpense" method="POST" class="flex flex-col gap-5">
-
-          <!-- Hidden ID -->
-          <input type="hidden" name="id" value="{{ expense[0] }}" />
+        <form action="/updateExpense" method="post" class="flex flex-col gap-5">
+          <input type="hidden" name="id" value="{{ expense.id }}" />
 
           <!-- Date -->
           <div>
             <p class="field-label">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                stroke-width="1.8" stroke="#9ca3af" class="w-3.5 h-3.5">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
+                stroke="#9ca3af" class="w-3.5 h-3.5">
                 <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5"/>
+                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
               </svg>
               Date
             </p>
             <div class="field-wrap">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                stroke-width="1.6" stroke="#c9773a" class="w-4 h-4 field-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6"
+                stroke="#c9773a" class="w-4 h-4 field-icon">
                 <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5"/>
+                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
               </svg>
-              <input type="date" name="exp_date" value="{{ expense[1] }}" class="field" />
+              <input type="date" name="exp_date" value="{{ expense.exp_date }}" class="field" />
+            </div>
+          </div>
+
+          <hr class="divider" />
+
+          <!-- Account -->
+          <div>
+            <p class="field-label">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
+                stroke="#9ca3af" class="w-3.5 h-3.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Account
+            </p>
+            <div class="field-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6"
+                stroke="#c9773a" class="w-4 h-4 field-icon">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <select name="account_id" class="field" required>
+                {% for acc in accounts %}
+                <option value="{{ acc.id }}" {% if expense.account_id==acc.id %}selected{% endif %}>{{ acc.name }}
+                </option>
+                {% endfor %}
+              </select>
             </div>
           </div>
 
@@ -173,50 +285,122 @@
           <!-- Category -->
           <div>
             <p class="field-label">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                stroke-width="1.8" stroke="#9ca3af" class="w-3.5 h-3.5">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
+                stroke="#9ca3af" class="w-3.5 h-3.5">
                 <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3zM6 6h.008v.008H6V6z"/>
+                  d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3zM6 6h.008v.008H6V6z" />
               </svg>
               Category
             </p>
             <div class="field-wrap">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                stroke-width="1.6" stroke="#c9773a" class="w-4 h-4 field-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6"
+                stroke="#c9773a" class="w-4 h-4 field-icon">
                 <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3zM6 6h.008v.008H6V6z"/>
+                  d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3zM6 6h.008v.008H6V6z" />
               </svg>
-              <select name="category" class="field">
-                <option value="food"          {% if expense[2] == 'food'          %}selected{% endif %}>🍽️ Food</option>
-                <option value="groceries"     {% if expense[2] == 'groceries'     %}selected{% endif %}>🛒 Groceries</option>
-                <option value="travel"        {% if expense[2] == 'travel'        %}selected{% endif %}>✈️ Travel</option>
-                <option value="clothing"      {% if expense[2] == 'clothing'      %}selected{% endif %}>👕 Clothing</option>
-                <option value="tech"          {% if expense[2] == 'tech'          %}selected{% endif %}>💻 Tech</option>
-                <option value="shopping"      {% if expense[2] == 'shopping'      %}selected{% endif %}>🛍️ Shopping</option>
-                <option value="entertainment" {% if expense[2] == 'entertainment' %}selected{% endif %}>🎬 Entertainment</option>
-                <option value="health"        {% if expense[2] == 'health'        %}selected{% endif %}>🏥 Healthcare</option>
-                <option value="bills"         {% if expense[2] == 'bills'         %}selected{% endif %}>📄 Bills</option>
-                <option value="other"         {% if expense[2] == 'other'         %}selected{% endif %}>📦 Other</option>
+              <select name="category" id="categorySelect" class="field">
+                <option value="">✦ Auto Detect</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if expense.category_id==cat.id %}selected{% endif %}>{{ cat.icon or ''
+                  }} {{ cat.name }}</option>
+                {% endfor %}
               </select>
             </div>
           </div>
 
           <hr class="divider" />
 
+          <!-- Subcategory -->
+          <div id="subcategoryContainer" style="display: none;">
+            <p class="field-label">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
+                stroke="#9ca3af" class="w-3.5 h-3.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+              </svg>
+              Subcategory
+            </p>
+            <div class="field-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6"
+                stroke="#c9773a" class="w-4 h-4 field-icon">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6z" />
+              </svg>
+              <select name="subcategory_id" id="subcategorySelect" class="field">
+                <option value="">None</option>
+              </select>
+              <!-- New Subcategory -->
+              <div class="mt-4">
+                <p class="field-label">
+                  Or Create New Subcategory
+                </p>
+
+                <div class="field-wrap">
+                  <input type="text" name="new_subcategory" class="field" placeholder="Pizza, Burger, Coffee...">
+                </div>
+              </div>
+            </div>
+            <hr class="divider mt-5" />
+          </div>
+
+          <script>
+            const categoriesData = {{ categories | tojson | safe }};
+            const currentSubcategoryId = "{{ expense.subcategory_id or '' }}";
+            const categorySelect = document.getElementById('categorySelect');
+            const subcategoryContainer = document.getElementById('subcategoryContainer');
+            const subcategorySelect = document.getElementById('subcategorySelect');
+
+            function populateSubcategories(categoryId, selectedSubId) {
+              subcategorySelect.innerHTML = '<option value="">None</option>';
+
+              if (!categoryId) {
+                subcategoryContainer.style.display = 'none';
+                return;
+              }
+
+              const category = categoriesData.find(c => String(c.id) === String(categoryId));
+              if (category && category.subcategories && category.subcategories.length > 0) {
+                category.subcategories.forEach(sub => {
+                  const option = document.createElement('option');
+                  option.value = sub.id;
+                  option.textContent = sub.name;
+                  if (String(sub.id) === String(selectedSubId)) {
+                    option.selected = true;
+                  }
+                  subcategorySelect.appendChild(option);
+                });
+                subcategoryContainer.style.display = 'block';
+              } else {
+                subcategoryContainer.style.display = 'none';
+              }
+            }
+
+            categorySelect.addEventListener('change', function () {
+              populateSubcategories(this.value, null);
+            });
+
+            // Populate on load
+            if (categorySelect.value) {
+              populateSubcategories(categorySelect.value, currentSubcategoryId);
+            }
+          </script>
+
+          <hr class="divider" />
+
           <!-- Amount -->
           <div>
             <p class="field-label">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                stroke-width="1.8" stroke="#9ca3af" class="w-3.5 h-3.5">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
+                stroke="#9ca3af" class="w-3.5 h-3.5">
                 <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M15 8.25H9m6 3H9m3 6l-3-3h1.5a3 3 0 100-6M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  d="M15 8.25H9m6 3H9m3 6l-3-3h1.5a3 3 0 100-6M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               Amount
             </p>
             <div class="field-wrap">
               <span class="field-icon text-sm font-bold" style="color:#c9773a">₹</span>
-              <input type="number" name="amount" value="{{ expense[3] }}"
-                step="0.01" min="0" placeholder="0.00" class="field" />
+              <input type="number" name="amount" value="{{ expense.amount }}" step="0.01" min="0" placeholder="0.00"
+                class="field" />
             </div>
           </div>
 
@@ -225,16 +409,16 @@
           <!-- Note -->
           <div>
             <p class="field-label">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                stroke-width="1.8" stroke="#9ca3af" class="w-3.5 h-3.5">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
+                stroke="#9ca3af" class="w-3.5 h-3.5">
                 <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M16.862 4.487a2.25 2.25 0 113.182 3.182L7.5 20.212l-4.5 1.5 1.5-4.5L16.862 4.487z"/>
+                  d="M16.862 4.487a2.25 2.25 0 113.182 3.182L7.5 20.212l-4.5 1.5 1.5-4.5L16.862 4.487z" />
               </svg>
               Note
             </p>
             <div class="field-wrap">
-              <textarea name="note" rows="3" placeholder="What did you spend on?"
-                class="field" style="padding-left:14px">{{ expense[4] }}</textarea>
+              <textarea name="note" rows="3" placeholder="What did you spend on?" class="field"
+                style="padding-left:14px">{{ expense.note }}</textarea>
             </div>
           </div>
 
@@ -243,25 +427,28 @@
           <!-- Payment -->
           <div>
             <p class="field-label">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                stroke-width="1.8" stroke="#9ca3af" class="w-3.5 h-3.5">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
+                stroke="#9ca3af" class="w-3.5 h-3.5">
                 <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/>
+                  d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
               </svg>
               Payment Method
             </p>
             <div class="field-wrap">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                stroke-width="1.6" stroke="#c9773a" class="w-4 h-4 field-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6"
+                stroke="#c9773a" class="w-4 h-4 field-icon">
                 <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/>
+                  d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
               </svg>
               <select name="payment" class="field">
-                <option value="cash"        {% if expense[5] == 'cash'        %}selected{% endif %}>💵 Cash</option>
-                <option value="upi"         {% if expense[5] == 'upi'         %}selected{% endif %}>📱 UPI</option>
-                <option value="credit_card" {% if expense[5] == 'credit_card' %}selected{% endif %}>💳 Credit Card</option>
-                <option value="debit_card"  {% if expense[5] == 'debit_card'  %}selected{% endif %}>🏧 Debit Card</option>
-                <option value="net_banking" {% if expense[5] == 'net_banking' %}selected{% endif %}>🏦 Net Banking</option>
+                <option value="cash" {% if expense.pay_method=='cash' %}selected{% endif %}>💵 Cash</option>
+                <option value="upi" {% if expense.pay_method=='upi' %}selected{% endif %}>📱 UPI</option>
+                <option value="credit_card" {% if expense.pay_method=='credit_card' %}selected{% endif %}>💳 Credit Card
+                </option>
+                <option value="debit_card" {% if expense.pay_method=='debit_card' %}selected{% endif %}>🏧 Debit Card
+                </option>
+                <option value="net_banking" {% if expense.pay_method=='net_banking' %}selected{% endif %}>🏦 Net Banking
+                </option>
               </select>
             </div>
           </div>
@@ -269,17 +456,17 @@
           <!-- Action buttons -->
           <div class="flex flex-col sm:flex-row gap-3 mt-1">
             <a href="javascript:history.back()" class="btn-cancel">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
               Cancel
             </a>
             <button type="submit" class="btn-submit">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                stroke-width="2.2" stroke="currentColor" class="w-4 h-4">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2"
+                stroke="currentColor" class="w-4 h-4">
                 <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               Update Expense
             </button>
@@ -294,4 +481,5 @@
   </div>
 
 </body>
+
 </html>

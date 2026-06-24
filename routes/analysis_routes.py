@@ -13,14 +13,20 @@ analysis_bp = Blueprint("analysis", __name__)
 @login_required
 def transaction_analysis():
 
-    category_totals_dict, month_amounts = (
-        transaction_analysis_service(current_user.id)
-    )
+    (   category_totals_dict,
+        month_amounts,
+        subcategory_totals_dict,
+        account_totals_dict,
+        payment_totals_dict
+    ) = transaction_analysis_service(current_user.id)
 
     return render_template(
         "transaction_analysis.html",
         category_totals_dict=category_totals_dict,
-        month_amounts=month_amounts
+        month_amounts=month_amounts,
+        subcategory_totals_dict=subcategory_totals_dict,
+        account_totals_dict=account_totals_dict,
+        payment_totals_dict=payment_totals_dict
     )
 
 
