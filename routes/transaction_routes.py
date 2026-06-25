@@ -1,11 +1,16 @@
-from flask import Blueprint, render_template, request
+from datetime import datetime
+
+from flask import Blueprint, render_template, request, send_file
 from flask_login import login_required, current_user
 
 from services.transaction_service import (
     get_transaction_history,
     monthly_transaction_details,
     filter_transactions,
-    get_user_accounts  # NEW: powers the Account filter dropdown
+    get_user_accounts,  # NEW: powers the Account filter dropdown
+    get_report_preview,  # NEW: Download Report preview summary
+    generate_excel_report,  # NEW: Download Report - Excel export
+    generate_csv_report  # NEW: Download Report - CSV export
 )
 from services.category_service import get_all_categories  # NEW: powers the cascading Category/Subcategory dropdowns
 
@@ -74,4 +79,116 @@ def filter_transaction():
         data=data,
         categories=categories,
         accounts=accounts
+    )
+
+
+# ============================================================
+# NEW: Download Report routes
+# ============================================================
+
+@transaction_bp.route("/download_report")
+@login_required
+def download_report():
+    # --- NEW: reads the 6 report filters straight from the
+    # querystring, the same way the other filtered pages above do.
+    month = request.args.get("month")
+    year = request.args.get("year")
+    category = request.args.get("category")
+    subcategory = request.args.get("subcategory")
+    account = request.args.get("account")
+    payment = request.args.get("payment")
+
+    # --- NEW: categories (with nested subcategories) and the user's
+    # accounts, used to populate the Category/Subcategory cascading
+    # dropdown and the Account dropdown on download_report.html.
+    categories = get_all_categories(current_user.id)
+    accounts = get_user_accounts(current_user.id)
+
+    # --- NEW: dynamic year list for the Year dropdown.
+    current_year = datetime.now().year
+    years = list(range(current_year - 3, current_year + 2))
+
+    # --- NEW: preview summary (total transactions, total expense, top
+    # category/account/payment method) for the currently selected
+    # filters.
+    preview = get_report_preview(
+        current_user.id,
+        month,
+        year,
+        category,
+        subcategory,
+        account,
+        payment
+    )
+
+    return render_template(
+        "download_report.html",
+        preview=preview,
+        categories=categories,
+        accounts=accounts,
+        years=years,
+        selected_month=month,
+        selected_year=year,
+        selected_category=category,
+        selected_subcategory=subcategory,
+        selected_account=account,
+        selected_payment=payment
+    )
+
+
+@transaction_bp.route("/download_report/excel")
+@login_required
+def download_report_excel():
+    # --- NEW: same 6 filters as /download_report, read identically.
+    month = request.args.get("month")
+    year = request.args.get("year")
+    category = request.args.get("category")
+    subcategory = request.args.get("subcategory")
+    account = request.args.get("account")
+    payment = request.args.get("payment")
+
+    buffer = generate_excel_report(
+        current_user.id,
+        month,
+        year,
+        category,
+        subcategory,
+        account,
+        payment
+    )
+
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name=f"Expense_Report_{month}_{year}.xlsx",
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
+
+@transaction_bp.route("/download_report/csv")
+@login_required
+def download_report_csv():
+    # --- NEW: same 6 filters as /download_report, read identically.
+    month = request.args.get("month")
+    year = request.args.get("year")
+    category = request.args.get("category")
+    subcategory = request.args.get("subcategory")
+    account = request.args.get("account")
+    payment = request.args.get("payment")
+
+    buffer = generate_csv_report(
+        current_user.id,
+        month,
+        year,
+        category,
+        subcategory,
+        account,
+        payment
+    )
+
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name=f"Expense_Report_{month}_{year}.csv",
+        mimetype="text/csv"
     )
