@@ -148,11 +148,40 @@
   .fade-up {
     animation: fadeUp 0.45s ease both;
   }
+
+  /* Amount gets extra visual emphasis */
+  .field-amount {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1f2937;
+    letter-spacing: 0.01em;
+  }
+
+  /* "Create new subcategory" reveal toggle */
+  .subcategory-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #c9773a;
+    background: #fdf3ea;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+
+  .subcategory-toggle-btn:hover {
+    background: #fbe7d4;
+  }
 </style>
 
 <body class="min-h-screen flex items-center justify-center px-4 py-10">
 
-  <div class="w-full max-w-md fade-up">
+  <div class="w-full max-w-lg fade-up">
 
     <!-- Header above card -->
     <div class="mb-6 text-center">
@@ -163,112 +192,140 @@
     <!-- Form Card -->
     <div class="card p-7">
 
-      <form method="post" class="flex flex-col gap-5">
+      <form method="post" class="flex flex-col gap-6">
 
-        <!-- Date -->
-        <div>
-          <p class="field-label">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#9ca3af"
-              class="w-3.5 h-3.5">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
-            </svg>
-            Date
-          </p>
-          <div class="field-wrap">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="#c9773a"
-              class="w-4 h-4 field-icon">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
-            </svg>
-            <input type="date" name="exp_date" required class="field" />
+        <!-- Row 1: Date + Account -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+          <!-- Date -->
+          <div>
+            <p class="field-label">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
+                stroke="#9ca3af" class="w-3.5 h-3.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
+              </svg>
+              Date
+            </p>
+            <div class="field-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6"
+                stroke="#c9773a" class="w-4 h-4 field-icon">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
+              </svg>
+              <input type="date" name="exp_date" required class="field" />
+            </div>
           </div>
+
+          <!-- Account -->
+          <div>
+            <p class="field-label">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
+                stroke="#9ca3af" class="w-3.5 h-3.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Account
+            </p>
+            <div class="field-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6"
+                stroke="#c9773a" class="w-4 h-4 field-icon">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <select name="account_id" class="field" required>
+                {% for acc in accounts %}
+                <option value="{{ acc.id }}">{{ acc.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
         </div>
 
-        <hr class="divider" />
+        <!-- Row 2: Category + Amount -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-        <!-- Account -->
-        <div>
-          <p class="field-label">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#9ca3af"
-              class="w-3.5 h-3.5">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Account
-          </p>
-          <div class="field-wrap">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="#c9773a"
-              class="w-4 h-4 field-icon">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <select name="account_id" class="field" required>
-              {% for acc in accounts %}
-              <option value="{{ acc.id }}">{{ acc.name }}</option>
-              {% endfor %}
-            </select>
+          <!-- Category -->
+          <div>
+            <p class="field-label">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
+                stroke="#9ca3af" class="w-3.5 h-3.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3zM6 6h.008v.008H6V6z" />
+              </svg>
+              Category
+            </p>
+            <div class="field-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6"
+                stroke="#c9773a" class="w-4 h-4 field-icon">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3zM6 6h.008v.008H6V6z" />
+              </svg>
+              <select name="category" id="categorySelect" class="field">
+                <option value="">✦ Auto Detect</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}">{{ cat.icon or '' }} {{ cat.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
           </div>
+
+          <!-- Amount (extra visual emphasis) -->
+          <div>
+            <p class="field-label">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
+                stroke="#9ca3af" class="w-3.5 h-3.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M15 8.25H9m6 3H9m3 6l-3-3h1.5a3 3 0 100-6M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Amount
+            </p>
+            <div class="field-wrap">
+              <!-- Rupee symbol as icon -->
+              <span class="field-icon text-base font-bold" style="color:#c9773a; transform:translateY(-50%)">₹</span>
+              <input type="number" name="amount" placeholder="0.00" step="0.01" min="0" required
+                class="field field-amount" />
+            </div>
+          </div>
+
         </div>
 
-        <hr class="divider" />
-
-        <!-- Category -->
-        <div>
-          <p class="field-label">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#9ca3af"
-              class="w-3.5 h-3.5">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3zM6 6h.008v.008H6V6z" />
-            </svg>
-            Category
-          </p>
-          <div class="field-wrap">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="#c9773a"
-              class="w-4 h-4 field-icon">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3zM6 6h.008v.008H6V6z" />
-            </svg>
-            <select name="category" id="categorySelect" class="field">
-              <option value="">✦ Auto Detect</option>
-              {% for cat in categories %}
-              <option value="{{ cat.id }}">{{ cat.icon or '' }} {{ cat.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-
-        <hr class="divider" />
-
-        <!-- Subcategory -->
+        <!-- Row 3 + 4: Subcategory (full width) -->
         <div id="subcategoryContainer" style="display: none;">
           <p class="field-label">
-            ...
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#9ca3af"
+              class="w-3.5 h-3.5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3zM6 6h.008v.008H6V6z" />
+            </svg>
             Subcategory
           </p>
 
           <div class="field-wrap">
-            <svg ... class="w-4 h-4 field-icon">
-              ...
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.6" stroke="#c9773a"
+              class="w-4 h-4 field-icon">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3zM6 6h.008v.008H6V6z" />
             </svg>
-
             <select name="subcategory_id" id="subcategorySelect" class="field">
               <option value="">Select Existing</option>
             </select>
           </div>
 
-          <!-- New Subcategory -->
+          <!-- New Subcategory: collapsed by default, reveals on demand -->
           <div class="mt-4">
-            <p class="field-label">
-              Or Create New Subcategory
-            </p>
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <p class="text-xs text-gray-400">Need a new subcategory?</p>
+              <button type="button" id="toggleNewSubBtn" class="subcategory-toggle-btn">
+                <span id="toggleNewSubIcon">+</span> Create New
+              </button>
+            </div>
 
-            <div class="field-wrap">
+            <div id="newSubcategoryWrap" class="field-wrap mt-3" style="display: none;">
               <input type="text" name="new_subcategory" class="field" placeholder="Pizza, Burger, Coffee...">
             </div>
           </div>
-
-          <hr class="divider mt-5" />
         </div>
 
         <script>
@@ -304,48 +361,22 @@
               subcategoryContainer.style.display = 'none';
             }
           });
+
+          // New-subcategory reveal toggle (purely presentational; does not touch
+          // the category/subcategory logic above, and uses the same `new_subcategory`
+          // field name the backend already expects)
+          const toggleNewSubBtn = document.getElementById('toggleNewSubBtn');
+          const newSubcategoryWrap = document.getElementById('newSubcategoryWrap');
+          const toggleNewSubIcon = document.getElementById('toggleNewSubIcon');
+
+          toggleNewSubBtn.addEventListener('click', function () {
+            const isHidden = newSubcategoryWrap.style.display === 'none';
+            newSubcategoryWrap.style.display = isHidden ? 'block' : 'none';
+            toggleNewSubIcon.textContent = isHidden ? '−' : '+';
+          });
         </script>
 
-        <hr class="divider" />
-
-        <!-- Amount -->
-        <div>
-          <p class="field-label">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#9ca3af"
-              class="w-3.5 h-3.5">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M15 8.25H9m6 3H9m3 6l-3-3h1.5a3 3 0 100-6M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Amount
-          </p>
-          <div class="field-wrap">
-            <!-- Rupee symbol as icon -->
-            <span class="field-icon text-sm font-bold" style="color:#c9773a; transform:translateY(-50%)">₹</span>
-            <input type="number" name="amount" placeholder="0.00" step="0.01" min="0" required class="field" />
-          </div>
-        </div>
-
-        <hr class="divider" />
-
-        <!-- Note -->
-        <div>
-          <p class="field-label">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#9ca3af"
-              class="w-3.5 h-3.5">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M16.862 4.487a2.25 2.25 0 113.182 3.182L7.5 20.212l-4.5 1.5 1.5-4.5L16.862 4.487z" />
-            </svg>
-            Note
-          </p>
-          <div class="field-wrap relative">
-            <textarea name="note" placeholder="What did you spend on?" rows="3" class="field"
-              style="padding-left: 14px;"></textarea>
-          </div>
-        </div>
-
-        <hr class="divider" />
-
-        <!-- Payment Method -->
+        <!-- Row 5: Payment Method (full width) -->
         <div>
           <p class="field-label">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#9ca3af"
@@ -368,6 +399,22 @@
               <option value="debit_card">🏧 Debit Card</option>
               <option value="net_banking">🏦 Net Banking</option>
             </select>
+          </div>
+        </div>
+
+        <!-- Row 6: Note (full width, larger textarea) -->
+        <div>
+          <p class="field-label">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#9ca3af"
+              class="w-3.5 h-3.5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M16.862 4.487a2.25 2.25 0 113.182 3.182L7.5 20.212l-4.5 1.5 1.5-4.5L16.862 4.487z" />
+            </svg>
+            Note
+          </p>
+          <div class="field-wrap relative">
+            <textarea name="note" placeholder="What did you spend on?" rows="4" class="field"
+              style="padding-left: 14px;"></textarea>
           </div>
         </div>
 
